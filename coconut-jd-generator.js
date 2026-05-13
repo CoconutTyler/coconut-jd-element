@@ -4,11 +4,10 @@
 // File location in Wix Studio: Public/custom-elements/coconut-jd-generator.js
 // Element tag: <coconut-jd-generator>
 //
-// IMPORTANT — This file contains a hardcoded OpenAI API key.
-// Acceptable ONLY for internal presentation phase. Before public release:
-//   1. Move OpenAI call to a Velo backend function (jsw file)
-//   2. Use wix-secrets-backend to read the key server-side
-//   3. Replace direct fetch with a wix-fetch call from front-end → backend
+// ✅ This file is SAFE to host publicly — no API keys, no secrets.
+// The AI enrichment is delegated to a Wix Velo backend endpoint:
+//   POST https://www.coconutva.com/_functions/generateJD
+// The backend holds the OpenAI key via wix-secrets-backend.
 // ============================================================
 
 class CoconutJDGenerator extends HTMLElement {
@@ -48,10 +47,10 @@ class CoconutJDGenerator extends HTMLElement {
     container-type: inline-size;
     container-name: cvembed;
     font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: #FAF6EE;
+    background: var(--cv-bg-cream);
     padding: 60px 0;
     box-sizing: border-box;
-    color: #07152B;
+    color: var(--cv-fg-1);
     -webkit-font-smoothing: antialiased;
     line-height: 1.55;
     font-size: 16px;
@@ -90,7 +89,7 @@ class CoconutJDGenerator extends HTMLElement {
     .cv-btn { font-size: 13.5px; padding: 12px 18px; }
     .cv-nav { gap: 8px; padding-top: 20px; }
     .cv-jd-details { grid-template-columns: 1fr; gap: 4px; }
-    .cv-jd-details .dk { color: #5C6B85; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
+    .cv-jd-details .dk { color: var(--cv-fg-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
   }
 
 :host, :root {
@@ -108,7 +107,7 @@ class CoconutJDGenerator extends HTMLElement {
     /* Surfaces */
     --cv-bg: #FFFFFF;
     --cv-bg-soft: #F7F7F4;
-    --cv-bg-cream: #FAF6EE;
+    --cv-bg-cream: #F5F5F7;
     --cv-bg-mint: #EAF5EE;
     /* Text */
     --cv-fg-1: #07152B;
@@ -146,11 +145,11 @@ class CoconutJDGenerator extends HTMLElement {
   }
 
   * { box-sizing: border-box; }
-  html { font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #07152B; -webkit-font-smoothing: antialiased; }
+  html { font-family: var(--cv-font-body); color: var(--cv-fg-1); -webkit-font-smoothing: antialiased; }
   body {
     margin: 0;
     padding: 0;
-    background: #FAF6EE;
+    background: var(--cv-bg-cream);
     min-height: 100vh;
     font-size: 16px;
     line-height: 1.55;
@@ -169,9 +168,9 @@ class CoconutJDGenerator extends HTMLElement {
 
   /* The main card */
   .cv-card {
-    background: #FFFFFF;
-    border-radius: 28px;
-    box-shadow: 0 6px 20px rgba(7,21,43,0.06), 0 1px 0 rgba(7,21,43,0.03);
+    background: var(--cv-bg);
+    border-radius: var(--cv-radius-xl);
+    box-shadow: var(--cv-shadow-card);
     padding: 48px;
     min-height: 560px;
     display: flex;
@@ -192,24 +191,24 @@ class CoconutJDGenerator extends HTMLElement {
   .cv-progress-track {
     flex: 1;
     height: 4px;
-    background: #F0F1F4;
-    border-radius: 999px;
+    background: var(--cv-border-soft);
+    border-radius: var(--cv-radius-pill);
     overflow: hidden;
   }
   .cv-progress-fill {
     height: 100%;
-    background: #50B080;
-    border-radius: 999px;
+    background: var(--cv-green-600);
+    border-radius: var(--cv-radius-pill);
     width: 0%;
-    transition: width 420ms cubic-bezier(0.16,1,0.3,1);
+    transition: width 420ms var(--cv-ease-out);
   }
   .cv-progress-label {
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #5C6B85;
+    color: var(--cv-fg-3);
     white-space: nowrap;
   }
 
@@ -220,7 +219,7 @@ class CoconutJDGenerator extends HTMLElement {
     display: none;
     flex-direction: column;
     flex: 1;
-    animation: stepIn 420ms cubic-bezier(0.16,1,0.3,1);
+    animation: stepIn 420ms var(--cv-ease-out);
   }
   .cv-step.active { display: flex; }
   @keyframes stepIn {
@@ -233,22 +232,22 @@ class CoconutJDGenerator extends HTMLElement {
   }
 
   .cv-eyebrow {
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #3F9A6E;
+    color: var(--cv-green-700);
     margin-bottom: 12px;
   }
 
   .cv-step-title {
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 800;
     font-size: 32px;
     line-height: 1.1;
     letter-spacing: -0.02em;
-    color: #0B1E3F;
+    color: var(--cv-navy-800);
     margin: 0 0 10px;
     text-wrap: balance;
   }
@@ -257,7 +256,7 @@ class CoconutJDGenerator extends HTMLElement {
   .cv-step-sub {
     font-size: 15px;
     line-height: 1.55;
-    color: #5C6B85;
+    color: var(--cv-fg-3);
     margin: 0 0 28px;
     max-width: 520px;
   }
@@ -278,11 +277,11 @@ class CoconutJDGenerator extends HTMLElement {
 
   .cv-label {
     display: block;
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 600;
     font-size: 13px;
     letter-spacing: 0.005em;
-    color: #0B1E3F;
+    color: var(--cv-navy-800);
     margin: 0 0 8px;
   }
 
@@ -291,27 +290,27 @@ class CoconutJDGenerator extends HTMLElement {
   .cv-textarea {
     width: 100%;
     padding: 13px 16px;
-    border: 1.5px solid #E6E8EE;
-    border-radius: 14px;
-    background: #FFFFFF;
-    color: #07152B;
+    border: 1.5px solid var(--cv-border);
+    border-radius: var(--cv-radius-md);
+    background: var(--cv-bg);
+    color: var(--cv-fg-1);
     font-family: inherit;
     font-size: 14.5px;
     font-weight: 500;
     outline: none;
-    transition: border-color 180ms cubic-bezier(0.22,0.61,0.36,1), box-shadow 180ms cubic-bezier(0.22,0.61,0.36,1), background 180ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: border-color 180ms var(--cv-ease), box-shadow 180ms var(--cv-ease), background 180ms var(--cv-ease);
   }
   .cv-input::placeholder,
-  .cv-textarea::placeholder { color: #5C6B85; font-weight: 400; }
+  .cv-textarea::placeholder { color: var(--cv-fg-3); font-weight: 400; }
   .cv-input:hover,
   .cv-select:hover,
   .cv-textarea:hover { border-color: #d4d8e1; }
   .cv-input:focus,
   .cv-select:focus,
   .cv-textarea:focus {
-    border-color: #50B080;
+    border-color: var(--cv-green-600);
     box-shadow: 0 0 0 4px rgba(80,176,128,0.14);
-    background: #FFFFFF;
+    background: var(--cv-bg);
   }
   .cv-textarea {
     resize: vertical;
@@ -339,38 +338,38 @@ class CoconutJDGenerator extends HTMLElement {
     align-items: center;
     gap: 6px;
     padding: 9px 14px;
-    border: 1.5px solid #E6E8EE;
-    border-radius: 999px;
-    background: #FFFFFF;
-    color: #2A3A55;
+    border: 1.5px solid var(--cv-border);
+    border-radius: var(--cv-radius-pill);
+    background: var(--cv-bg);
+    color: var(--cv-fg-2);
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 160ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: all 160ms var(--cv-ease);
     user-select: none;
     white-space: nowrap;
   }
   .cv-pill:hover {
-    border-color: #6EC79A;
-    color: #0B1E3F;
+    border-color: var(--cv-green-500);
+    color: var(--cv-navy-800);
   }
   .cv-pill.on {
-    background: #DEF2E6;
-    border-color: #50B080;
-    color: #3F9A6E;
+    background: var(--cv-green-100);
+    border-color: var(--cv-green-600);
+    color: var(--cv-green-700);
   }
   .cv-pill.suggested {
     border-style: dashed;
-    border-color: #6EC79A;
-    color: #3F9A6E;
+    border-color: var(--cv-green-500);
+    color: var(--cv-green-700);
   }
 
   /* Custom tool pill — has a small × to remove */
   .cv-pill.custom {
-    background: #DEF2E6;
-    border-color: #50B080;
-    color: #3F9A6E;
+    background: var(--cv-green-100);
+    border-color: var(--cv-green-600);
+    color: var(--cv-green-700);
     padding-right: 8px;
   }
   .cv-pill .pill-x {
@@ -383,7 +382,7 @@ class CoconutJDGenerator extends HTMLElement {
     background: rgba(63,154,110,0.15);
     margin-left: 4px;
     cursor: pointer;
-    transition: background 140ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: background 140ms var(--cv-ease);
   }
   .cv-pill .pill-x:hover {
     background: rgba(63,154,110,0.3);
@@ -391,15 +390,15 @@ class CoconutJDGenerator extends HTMLElement {
   .cv-pill .pill-x svg {
     width: 9px;
     height: 9px;
-    color: #3F9A6E;
+    color: var(--cv-green-700);
   }
 
   /* Add tool button */
   .cv-add-btn {
     background: transparent;
-    border: 1.5px dashed #E6E8EE;
-    color: #5C6B85;
-    border-radius: 999px;
+    border: 1.5px dashed var(--cv-border);
+    color: var(--cv-fg-3);
+    border-radius: var(--cv-radius-pill);
     padding: 8px 14px;
     font-family: inherit;
     font-size: 13px;
@@ -408,12 +407,12 @@ class CoconutJDGenerator extends HTMLElement {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: all 160ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: all 160ms var(--cv-ease);
   }
   .cv-add-btn:hover {
-    border-color: #50B080;
-    color: #3F9A6E;
-    background: #DEF2E6;
+    border-color: var(--cv-green-600);
+    color: var(--cv-green-700);
+    background: var(--cv-green-100);
   }
   .cv-add-btn svg {
     width: 12px;
@@ -432,45 +431,45 @@ class CoconutJDGenerator extends HTMLElement {
     max-height: 280px;
     overflow-y: auto;
     padding: 8px;
-    background: #F7F7F4;
-    border: 1.5px solid #E6E8EE;
-    border-radius: 14px;
+    background: var(--cv-bg-soft);
+    border: 1.5px solid var(--cv-border);
+    border-radius: var(--cv-radius-md);
   }
   .cv-resp-item {
     display: flex;
     align-items: flex-start;
     gap: 10px;
     padding: 9px 10px;
-    border-radius: 8px;
+    border-radius: var(--cv-radius-sm);
     cursor: pointer;
     font-size: 13.5px;
     line-height: 1.5;
-    color: #2A3A55;
-    transition: background 140ms cubic-bezier(0.22,0.61,0.36,1);
+    color: var(--cv-fg-2);
+    transition: background 140ms var(--cv-ease);
   }
-  .cv-resp-item:hover { background: #FFFFFF; }
-  .cv-resp-item.on { background: #DEF2E6; color: #0B1E3F; }
+  .cv-resp-item:hover { background: var(--cv-bg); }
+  .cv-resp-item.on { background: var(--cv-green-100); color: var(--cv-navy-800); }
   .cv-resp-check {
     width: 18px; height: 18px; flex-shrink: 0;
-    border: 1.5px solid #E6E8EE;
+    border: 1.5px solid var(--cv-border);
     border-radius: 5px;
-    background: #FFFFFF;
+    background: var(--cv-bg);
     display: flex; align-items: center; justify-content: center;
     margin-top: 1px;
-    transition: all 140ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: all 140ms var(--cv-ease);
   }
-  .cv-resp-check svg { width: 11px; height: 11px; color: #FFFFFF; opacity: 0; }
-  .cv-resp-item.on .cv-resp-check { background: #50B080; border-color: #50B080; }
+  .cv-resp-check svg { width: 11px; height: 11px; color: var(--cv-fg-inverse); opacity: 0; }
+  .cv-resp-item.on .cv-resp-check { background: var(--cv-green-600); border-color: var(--cv-green-600); }
   .cv-resp-item.on .cv-resp-check svg { opacity: 1; }
   .cv-badge-mini {
     display: inline-block;
-    background: #FFFFFF;
-    border: 1px solid #E6E8EE;
-    color: #5C6B85;
+    background: var(--cv-bg);
+    border: 1px solid var(--cv-border);
+    color: var(--cv-fg-3);
     font-size: 10.5px;
     font-weight: 600;
     padding: 2px 7px;
-    border-radius: 999px;
+    border-radius: var(--cv-radius-pill);
     margin-left: 6px;
     letter-spacing: 0.02em;
   }
@@ -478,12 +477,12 @@ class CoconutJDGenerator extends HTMLElement {
   /* Non-negotiables structured */
   .cv-non-cat {
     display: flex; align-items: center; gap: 8px;
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 700;
     font-size: 11.5px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #3F9A6E;
+    color: var(--cv-green-700);
     margin: 0 0 6px;
   }
   .cv-non-block { margin-bottom: 14px; }
@@ -500,14 +499,14 @@ class CoconutJDGenerator extends HTMLElement {
     padding-top: 28px;
   }
   .cv-btn {
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 700;
     font-size: 14.5px;
-    border-radius: 999px;
+    border-radius: var(--cv-radius-pill);
     padding: 14px 24px;
     border: none;
     cursor: pointer;
-    transition: all 180ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: all 180ms var(--cv-ease);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -521,28 +520,28 @@ class CoconutJDGenerator extends HTMLElement {
     cursor: not-allowed;
   }
   .cv-btn-primary {
-    background: #50B080;
-    color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(7,21,43,0.06);
+    background: var(--cv-green-600);
+    color: var(--cv-fg-inverse);
+    box-shadow: var(--cv-shadow-sm);
   }
   .cv-btn-primary:hover:not(:disabled) {
-    background: #3F9A6E;
-    box-shadow: 0 10px 28px rgba(7,21,43,0.08);
+    background: var(--cv-green-700);
+    box-shadow: var(--cv-shadow-md);
     transform: translateY(-1px);
   }
   .cv-btn-primary:active:not(:disabled) { transform: translateY(0); }
   .cv-btn-ghost {
     background: transparent;
-    color: #5C6B85;
+    color: var(--cv-fg-3);
     padding: 14px 14px;
   }
-  .cv-btn-ghost:hover { color: #0B1E3F; }
+  .cv-btn-ghost:hover { color: var(--cv-navy-800); }
   .cv-btn-navy {
-    background: #0B1E3F;
-    color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(7,21,43,0.06);
+    background: var(--cv-navy-800);
+    color: var(--cv-fg-inverse);
+    box-shadow: var(--cv-shadow-sm);
   }
-  .cv-btn-navy:hover { background: #122A52; box-shadow: 0 10px 28px rgba(7,21,43,0.08); transform: translateY(-1px); }
+  .cv-btn-navy:hover { background: var(--cv-navy-700); box-shadow: var(--cv-shadow-md); transform: translateY(-1px); }
   .cv-btn svg { width: 14px; height: 14px; }
 
   /* ============================================
@@ -552,7 +551,7 @@ class CoconutJDGenerator extends HTMLElement {
   .cv-loading-icon {
     width: 64px; height: 64px;
     border-radius: 50%;
-    background: #DEF2E6;
+    background: var(--cv-green-100);
     display: flex; align-items: center; justify-content: center;
     margin: 24px auto 24px;
     position: relative;
@@ -562,14 +561,14 @@ class CoconutJDGenerator extends HTMLElement {
     position: absolute;
     inset: -6px;
     border-radius: 50%;
-    border: 2px solid #C0E5D2;
-    border-top-color: #50B080;
+    border: 2px solid var(--cv-green-200);
+    border-top-color: var(--cv-green-600);
     animation: spin 1.2s linear infinite;
     opacity: 0;
-    transition: opacity 220ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: opacity 220ms var(--cv-ease);
   }
   .cv-loading-icon.spinning::before { opacity: 1; }
-  .cv-loading-icon svg { width: 28px; height: 28px; color: #3F9A6E; }
+  .cv-loading-icon svg { width: 28px; height: 28px; color: var(--cv-green-700); }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
   .cv-loading-form {
@@ -582,7 +581,7 @@ class CoconutJDGenerator extends HTMLElement {
   }
   .cv-loading-microcopy {
     font-size: 12.5px;
-    color: #5C6B85;
+    color: var(--cv-fg-3);
     margin-top: 16px;
   }
 
@@ -590,12 +589,12 @@ class CoconutJDGenerator extends HTMLElement {
      STEP 7 — Result
      ============================================ */
   .cv-result-hero {
-    background: linear-gradient(180deg, #EAF5EE 0%, #FAF6EE 100%);
-    border-radius: 20px;
+    background: linear-gradient(180deg, var(--cv-bg-mint) 0%, var(--cv-bg-cream) 100%);
+    border-radius: var(--cv-radius-lg);
     padding: 32px;
     margin: 0 0 28px;
     text-align: center;
-    border: 1px solid #C0E5D2;
+    border: 1px solid var(--cv-green-200);
   }
   
   .cv-result-stats {
@@ -604,28 +603,28 @@ class CoconutJDGenerator extends HTMLElement {
     gap: 8px;
     flex-wrap: wrap;
     margin-bottom: 16px;
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #122A52;
+    color: var(--cv-navy-700);
   }
-  .cv-result-stats .dot { color: #50B080; font-weight: 800; }
+  .cv-result-stats .dot { color: var(--cv-green-600); font-weight: 800; }
   .cv-result-headline {
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 800;
     font-size: 30px;
     line-height: 1.1;
     letter-spacing: -0.02em;
-    color: #0B1E3F;
+    color: var(--cv-navy-800);
     margin: 0 0 8px;
     text-wrap: balance;
   }
   
   .cv-result-sub {
     font-size: 14.5px;
-    color: #2A3A55;
+    color: var(--cv-fg-2);
     margin: 0 0 22px;
     max-width: 440px;
     margin-left: auto;
@@ -639,32 +638,32 @@ class CoconutJDGenerator extends HTMLElement {
   }
 
   .cv-jd-doc {
-    background: #FFFFFF;
-    border: 1px solid #E6E8EE;
-    border-radius: 20px;
+    background: var(--cv-bg);
+    border: 1px solid var(--cv-border);
+    border-radius: var(--cv-radius-lg);
     padding: 32px;
     margin-bottom: 16px;
   }
   
   .cv-jd-title {
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 800;
     font-size: 22px;
     line-height: 1.2;
-    color: #0B1E3F;
+    color: var(--cv-navy-800);
     margin: 0 0 4px;
     letter-spacing: -0.01em;
   }
   .cv-jd-subtitle {
     font-size: 13px;
-    color: #5C6B85;
+    color: var(--cv-fg-3);
     padding-bottom: 16px;
     margin-bottom: 18px;
-    border-bottom: 1px solid #F0F1F4;
+    border-bottom: 1px solid var(--cv-border-soft);
   }
   .cv-jd-section {
     margin-bottom: 18px;
-    animation: sectionFade 380ms cubic-bezier(0.16,1,0.3,1) backwards;
+    animation: sectionFade 380ms var(--cv-ease-out) backwards;
   }
   .cv-jd-section:nth-child(2) { animation-delay: 80ms; }
   .cv-jd-section:nth-child(3) { animation-delay: 160ms; }
@@ -678,48 +677,48 @@ class CoconutJDGenerator extends HTMLElement {
   }
   .cv-jd-h3 {
     display: flex; align-items: center; justify-content: space-between;
-    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cv-font-display);
     font-weight: 700;
     font-size: 14px;
-    color: #0B1E3F;
+    color: var(--cv-navy-800);
     margin: 0 0 8px;
     letter-spacing: 0.01em;
   }
   .cv-jd-section ul { margin: 0; padding-left: 18px; }
-  .cv-jd-section li { font-size: 13.5px; line-height: 1.6; color: #2A3A55; margin: 4px 0; }
+  .cv-jd-section li { font-size: 13.5px; line-height: 1.6; color: var(--cv-fg-2); margin: 4px 0; }
   .cv-jd-details { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 13px; }
-  .cv-jd-details .dk { color: #5C6B85; font-weight: 600; }
-  .cv-jd-details .dv { color: #0B1E3F; font-weight: 500; }
+  .cv-jd-details .dk { color: var(--cv-fg-3); font-weight: 600; }
+  .cv-jd-details .dv { color: var(--cv-navy-800); font-weight: 500; }
 
   .cv-copy-btn {
     background: transparent;
-    border: 1px solid #E6E8EE;
-    color: #5C6B85;
-    border-radius: 8px;
+    border: 1px solid var(--cv-border);
+    color: var(--cv-fg-3);
+    border-radius: var(--cv-radius-sm);
     padding: 4px 10px;
     font-size: 11px;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
     display: inline-flex; align-items: center; gap: 5px;
-    transition: all 140ms cubic-bezier(0.22,0.61,0.36,1);
+    transition: all 140ms var(--cv-ease);
   }
-  .cv-copy-btn:hover { color: #0B1E3F; border-color: #2C4F8C; }
-  .cv-copy-btn.copied { color: #3F9A6E; border-color: #50B080; }
+  .cv-copy-btn:hover { color: var(--cv-navy-800); border-color: var(--cv-navy-500); }
+  .cv-copy-btn.copied { color: var(--cv-green-700); border-color: var(--cv-green-600); }
   .cv-copy-btn svg { width: 11px; height: 11px; }
 
   .cv-result-footer {
     text-align: center;
     font-size: 12.5px;
-    color: #5C6B85;
+    color: var(--cv-fg-3);
     padding-top: 8px;
   }
   .cv-result-footer .start-over {
-    background: none; border: none; color: #5C6B85;
+    background: none; border: none; color: var(--cv-fg-3);
     text-decoration: underline; cursor: pointer; font: inherit;
     font-weight: 600;
   }
-  .cv-result-footer .start-over:hover { color: #0B1E3F; }
+  .cv-result-footer .start-over:hover { color: var(--cv-navy-800); }
 
   /* Result hero is in step 7 — needs full width inside card */
   #step7 .cv-step-content { width: 100%; }
@@ -734,8 +733,8 @@ class CoconutJDGenerator extends HTMLElement {
      ============================================ */
   .cv-resp-list::-webkit-scrollbar { width: 6px; }
   .cv-resp-list::-webkit-scrollbar-track { background: transparent; }
-  .cv-resp-list::-webkit-scrollbar-thumb { background: #E6E8EE; border-radius: 99px; }
-  .cv-resp-list::-webkit-scrollbar-thumb:hover { background: #5C6B85; }
+  .cv-resp-list::-webkit-scrollbar-thumb { background: var(--cv-border); border-radius: 99px; }
+  .cv-resp-list::-webkit-scrollbar-thumb:hover { background: var(--cv-fg-3); }
 
   /* Hide step nav on result step */
   #step7 + .cv-nav { display: none; }
@@ -830,7 +829,7 @@ class CoconutJDGenerator extends HTMLElement {
       </div>
 
       <div class="cv-field" id="subFlavorField" style="display:none;">
-        <label class="cv-label">Add a specialization <span style="color:#5C6B85; font-weight:500;">(optional)</span></label>
+        <label class="cv-label">Add a specialization <span style="color:var(--cv-fg-3); font-weight:500;">(optional)</span></label>
         <div class="cv-pills" id="subFlavorPills"></div>
       </div>
 
@@ -866,18 +865,18 @@ class CoconutJDGenerator extends HTMLElement {
       <div class="cv-field">
         <label class="cv-label">Responsibilities</label>
         <div class="cv-resp-list" id="respList">
-          <p style="font-size:13px; color:#5C6B85; padding:16px; text-align:center; margin:0;">Pick a role first to see suggested responsibilities.</p>
+          <p style="font-size:13px; color:var(--cv-fg-3); padding:16px; text-align:center; margin:0;">Pick a role first to see suggested responsibilities.</p>
         </div>
       </div>
 
       <div class="cv-field">
-        <label class="cv-label" for="qTasks">Anything else they should own? <span style="color:#5C6B85; font-weight:500;">(optional)</span></label>
+        <label class="cv-label" for="qTasks">Anything else they should own? <span style="color:var(--cv-fg-3); font-weight:500;">(optional)</span></label>
         <textarea class="cv-textarea" id="qTasks" rows="2" placeholder="e.g. light bookkeeping in QuickBooks, travel planning..."></textarea>
       </div>
 
       <div class="cv-field">
         <label class="cv-label">Tools they'll use</label>
-        <p class="q-hint" id="toolHint" style="display:none; font-size:12.5px; color:#5C6B85; margin: 0 0 10px;">Suggested for this role. Click to select, or add your own.</p>
+        <p class="q-hint" id="toolHint" style="display:none; font-size:12.5px; color:var(--cv-fg-3); margin: 0 0 10px;">Suggested for this role. Click to select, or add your own.</p>
         <div class="cv-pills" id="toolPills"></div>
         <div class="cv-tool-add" id="toolAddWrap" style="display:none; margin-top: 10px;">
           <button type="button" class="cv-add-btn" id="toolAddBtn">
@@ -906,7 +905,7 @@ class CoconutJDGenerator extends HTMLElement {
         <input type="text" class="cv-input" id="qNonRole" placeholder="e.g. 3+ years supporting a founder or C-suite executive" />
       </div>
       <div class="cv-non-block">
-        <p class="cv-non-cat">Industry experience <span style="color:#5C6B85; font-weight:500; text-transform:none; letter-spacing:0;">(optional)</span></p>
+        <p class="cv-non-cat">Industry experience <span style="color:var(--cv-fg-3); font-weight:500; text-transform:none; letter-spacing:0;">(optional)</span></p>
         <input type="text" class="cv-input" id="qNonIndustry" placeholder="e.g. real estate, SaaS, agency..." />
       </div>
       <div class="cv-non-block">
@@ -925,7 +924,7 @@ class CoconutJDGenerator extends HTMLElement {
           </select>
         </div>
         <div>
-          <label class="cv-label" for="qNice">Nice to have <span style="color:#5C6B85; font-weight:500;">(optional)</span></label>
+          <label class="cv-label" for="qNice">Nice to have <span style="color:var(--cv-fg-3); font-weight:500;">(optional)</span></label>
           <input type="text" class="cv-input" id="qNice" placeholder="e.g. background in startups" />
         </div>
       </div>
@@ -1523,7 +1522,7 @@ class CoconutJDGenerator extends HTMLElement {
   function populateRespList() {
     var list = $('respList');
     if (!state.role) {
-      list.innerHTML = '<p style="font-size:13px; color:#5C6B85; padding:16px; text-align:center; margin:0;">Pick a role first to see suggested responsibilities.</p>';
+      list.innerHTML = '<p style="font-size:13px; color:var(--cv-fg-3); padding:16px; text-align:center; margin:0;">Pick a role first to see suggested responsibilities.</p>';
       return;
     }
     var data = getRoleData(state.role);
@@ -1581,7 +1580,7 @@ class CoconutJDGenerator extends HTMLElement {
     var hint = $('toolHint');
 
     if (!state.bucket) {
-      container.innerHTML = '<p style="font-size:13px; color:#5C6B85; padding:8px 4px; margin:0;">Pick a role above to see relevant tools.</p>';
+      container.innerHTML = '<p style="font-size:13px; color:var(--cv-fg-3); padding:8px 4px; margin:0;">Pick a role above to see relevant tools.</p>';
       addWrap.style.display = 'none';
       hint.style.display = 'none';
       return;
@@ -1759,15 +1758,18 @@ class CoconutJDGenerator extends HTMLElement {
   });
 
   // =========================================================
-  // OPENAI INTEGRATION
+  // AI ENRICHMENT — Backend call (key protected server-side)
   // =========================================================
-  // NOTE: This key is exposed in client-side code. Acceptable for this mockup
-  // only. In production (Wix), this MUST move to a Velo backend function.
-  var OPENAI_KEY = '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';
-  var OPENAI_MODEL = 'gpt-4o-mini';
+  // Endpoint hosted by Wix Velo:
+  //   POST https://www.coconutva.com/_functions/generateJD
+  // Backend (Velo): backend/http-functions.js + backend/openai.js
+  // The OpenAI key is in Wix Secrets Manager. Never touches the browser.
+  // =========================================================
+  var BACKEND_ENDPOINT = 'https://www.coconutva.com/_functions/generateJD';
   var SESSION_KEY = 'coconut_jd_generated';
 
-  function buildAIPrompt() {
+
+  function buildPayload() {
     var roleLabel = state.roleLabel || 'role';
     var roleData = getRoleData(state.role);
     var checked = Array.from(state.checkedResp);
@@ -1777,17 +1779,19 @@ class CoconutJDGenerator extends HTMLElement {
       if (f) subFlavorLabels.push(f.label);
     });
 
-    var inputs = {
+    return {
       company: state.company,
       industry: state.industry,
       years_in_business: state.years,
       hiring_manager_role: state.position,
       role: roleLabel,
+      role_id: state.role,
       specializations: subFlavorLabels,
       experience_level: state.exp,
       checked_responsibilities: checked,
       free_text_extras: state.tasks,
       tools: Array.from(state.tools),
+      custom_tools: Array.from(state.customTools),
       english_level: state.english,
       raw_non_negotiables: {
         software: state.nonSoft,
@@ -1797,94 +1801,51 @@ class CoconutJDGenerator extends HTMLElement {
       },
       raw_nice_to_have: state.nice,
       time_zone: state.tzZone,
-      hours: state.hours
+      time_zone_window: state.tzWindow,
+      hours: state.hours,
+      count: state.count,
+      contact_name: state.name,
+      contact_email: state.email,
+      tier: state.tier,
+      submitted_at: new Date().toISOString()
     };
-
-    var systemPrompt = "You are a senior recruiter at Coconut, a premium remote staffing agency placing Filipino professionals at growing US/UK companies. You write polished job descriptions in Coconut's house voice: clear, action-oriented, tools-specific, no generic fluff. You take raw founder inputs and transform them into a professional job description that founders would pay $500 to have written. Always return STRICT JSON only, no markdown, no preamble.";
-
-    var userPrompt = "Generate a polished, recruiter-grade job description from these founder inputs:\n\n" +
-      JSON.stringify(inputs, null, 2) +
-      "\n\nReturn STRICT JSON with this exact shape:\n" +
-      "{\n" +
-      '  "about_paragraph": "3-4 sentence engaging intro about the role. Mention company name naturally, infer what the company does from industry+years, describe the broader mission this person joins. Sound human and specific, not template-y. End mentioning it being a fully remote role.",\n' +
-      '  "responsibilities": ["bullet 1", "bullet 2", ...],\n' +
-      '  "non_negotiables": ["filter 1", "filter 2", ...],\n' +
-      '  "nice_to_haves": ["bonus 1", "bonus 2", ...]\n' +
-      "}\n\n" +
-      "Rules for responsibilities (8-12 bullets):\n" +
-      "- Use checked_responsibilities as foundation. Refine wording, don't replace meaning.\n" +
-      "- Integrate free_text_extras polished into Coconut voice.\n" +
-      "- Each bullet starts with action verb, mentions specific tools when relevant, is ONE clear sentence.\n" +
-      "- Order from most important to least important.\n" +
-      "- Add 1-2 specialized bullets based on industry context (e.g. real estate → mention MLS; SaaS → mention product onboarding).\n" +
-      "- NEVER use markdown, NEVER use generic skill bullets like 'strong communication' (those go in non_negotiables).\n\n" +
-      "Rules for non_negotiables (4-6 items):\n" +
-      "- Take raw_non_negotiables values and polish each into a professional 'must-have' line.\n" +
-      "- Combine english_level naturally (e.g. 'Strong written and spoken English, comfortable on client calls').\n" +
-      "- Skip empty or 'n/a' values, don't include them.\n" +
-      "- Add 1-2 implied must-haves the founder forgot but matter for this role (reliability, time zone overlap, attention to detail tied to the role).\n" +
-      "- Each item is a clear filter a recruiter could screen against.\n\n" +
-      "Rules for nice_to_haves (3-5 items):\n" +
-      "- Use raw_nice_to_have if provided and polish it.\n" +
-      "- Infer 2-4 bonuses based on role + industry + tools (e.g. 'Experience with venture-backed startups' for tech roles, 'Familiarity with X tool' when relevant).\n" +
-      "- Make these aspirational, not redundant with non_negotiables.\n\n" +
-      "Rules for about_paragraph:\n" +
-      "- Use company name naturally, never in ALL CAPS or quoted.\n" +
-      "- Make industry feel specific, not labeled. Say 'a growing professional services firm' not 'a company in Professional Services'.\n" +
-      "- Sound like the founder wrote it warmly, not a template.";
-
-    return { system: systemPrompt, user: userPrompt };
   }
 
-  function callOpenAI() {
+  function callBackend() {
     return new Promise(function(resolve, reject) {
-      var prompts = buildAIPrompt();
+      var payload = buildPayload();
       var timedOut = false;
 
-      // Timeout via Promise.race (sandbox-safe, avoids AbortController issue)
       var timeoutPromise = new Promise(function(_, rej) {
         setTimeout(function() {
           timedOut = true;
-          rej(new Error('Request timed out after 45 seconds. Please try again.'));
-        }, 45000);
+          rej(new Error('Request timed out after 60 seconds. Please try again.'));
+        }, 60000);
       });
 
-      var fetchPromise = fetch('https://api.openai.com/v1/chat/completions', {
+      var fetchPromise = fetch(BACKEND_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + OPENAI_KEY
-        },
-        body: JSON.stringify({
-          model: OPENAI_MODEL,
-          messages: [
-            { role: 'system', content: prompts.system },
-            { role: 'user', content: prompts.user }
-          ],
-          max_tokens: 1400,
-          temperature: 0.7,
-          response_format: { type: 'json_object' }
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       }).then(function(res) {
         if (timedOut) return;
         if (!res.ok) {
-          return res.json().then(function(err) {
-            var msg = (err && err.error && err.error.message) ? err.error.message : ('OpenAI API error: ' + res.status);
+          return res.text().then(function(txt) {
+            var msg = 'Backend error ' + res.status;
+            try {
+              var parsed = JSON.parse(txt);
+              if (parsed && parsed.error) msg = parsed.error;
+            } catch(e) { if (txt) msg = txt.slice(0, 200); }
             throw new Error(msg);
           });
         }
         return res.json();
       }).then(function(data) {
         if (timedOut) return;
-        var content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-        if (!content) throw new Error('Empty response from OpenAI');
-        var parsed;
-        try { parsed = JSON.parse(content); }
-        catch (e) { throw new Error('OpenAI returned invalid JSON'); }
-        if (!parsed.about_paragraph || !Array.isArray(parsed.responsibilities)) {
-          throw new Error('OpenAI returned malformed JSON structure');
+        if (!data || !data.about_paragraph || !Array.isArray(data.responsibilities)) {
+          throw new Error('Backend returned malformed response');
         }
-        return parsed;
+        return data;
       });
 
       Promise.race([fetchPromise, timeoutPromise]).then(resolve).catch(reject);
@@ -1909,8 +1870,8 @@ class CoconutJDGenerator extends HTMLElement {
     // Compute deterministic results (score, days, tier)
     computeResults();
 
-    // Call OpenAI for AI-enriched JD
-    callOpenAI().then(function(ai) {
+    // Call backend for AI-enriched JD (key stays server-side)
+    callBackend().then(function(ai) {
       state._aiAbout = ai.about_paragraph;
       state._aiResponsibilities = ai.responsibilities;
       state._aiNonNegotiables = Array.isArray(ai.non_negotiables) ? ai.non_negotiables : null;
@@ -1920,7 +1881,7 @@ class CoconutJDGenerator extends HTMLElement {
       renderJD();
       goToStep(7);
     }).catch(function(err) {
-      console.error('OpenAI call failed:', err);
+      console.error('Backend call failed:', err);
       state._aiAbout = null;
       state._aiResponsibilities = null;
       state._aiNonNegotiables = null;
@@ -1993,10 +1954,10 @@ class CoconutJDGenerator extends HTMLElement {
     // About the role — use AI if available, else template fallback
     var aboutHtml;
     if (state._aiAbout) {
-      aboutHtml = '<p style="font-size:13.5px; line-height:1.6; color:#2A3A55; margin:0;">' +
+      aboutHtml = '<p style="font-size:13.5px; line-height:1.6; color:var(--cv-fg-2); margin:0;">' +
         escapeHtml(state._aiAbout) + '</p>';
     } else {
-      aboutHtml = '<p style="font-size:13.5px; line-height:1.6; color:#2A3A55; margin:0;">' +
+      aboutHtml = '<p style="font-size:13.5px; line-height:1.6; color:var(--cv-fg-2); margin:0;">' +
         (state.company ? escapeHtml(state.company) : 'We') + ' is hiring a remote ' + escapeHtml(roleLabel) +
         ' to ' + (roleData.description.toLowerCase().replace(/\.$/, '')) + '. This is a fully remote, ' +
         (state.hours ? escapeHtml(state.hours.toLowerCase()) : 'part-time') + ' role within ' +
@@ -2144,8 +2105,8 @@ class CoconutJDGenerator extends HTMLElement {
     if (state._aiError && footerP) {
       var errMsg = state._aiError;
       footerP.innerHTML =
-        '<span style="color:#E54B4B; font-weight:700;">⚠ AI enrichment failed</span> · ' +
-        '<span style="color:#2A3A55;">' + escapeHtml(errMsg) + '</span> · ' +
+        '<span style="color:var(--cv-error); font-weight:700;">⚠ AI enrichment failed</span> · ' +
+        '<span style="color:var(--cv-fg-2);">' + escapeHtml(errMsg) + '</span> · ' +
         '<button class="start-over" id="startOver">Try again →</button>';
       var newStartOver = root.getElementById('startOver');
       if (newStartOver) {
