@@ -1,14 +1,16 @@
 // ============================================================
 // COCONUT — Job Description Generator — Wix Custom Element (Velo)
 // ============================================================
-// File location in Wix Studio: Public/custom-elements/coconut-jd-generator.js
+// File location in Wix Studio: served via Server URL (jsDelivr from GitHub)
 // Element tag: <coconut-jd-generator>
 //
-// IMPORTANT — This file contains a hardcoded OpenAI API key.
-// Acceptable ONLY for internal presentation phase. Before public release:
-//   1. Move OpenAI call to a Velo backend function (jsw file)
-//   2. Use wix-secrets-backend to read the key server-side
-//   3. Replace direct fetch with a wix-fetch call from front-end → backend
+// ✅ This file is SAFE to host publicly — no API keys, no secrets.
+//
+// The AI enrichment is delegated to a Wix Velo backend endpoint:
+//   POST https://www.coconutva.com/_functions/generateJD
+//
+// The backend file (backend/http-functions.js + backend/openai.jsw) holds
+// the OpenAI key via wix-secrets-backend and proxies the request.
 // ============================================================
 
 class CoconutJDGenerator extends HTMLElement {
@@ -1751,15 +1753,19 @@ class CoconutJDGenerator extends HTMLElement {
   });
 
   // =========================================================
-  // OPENAI INTEGRATION
+  // AI ENRICHMENT — Backend call (chave protegida server-side)
   // =========================================================
-  // NOTE: This key is exposed in client-side code. Acceptable for this mockup
-  // only. In production (Wix), this MUST move to a Velo backend function.
-  var OPENAI_KEY = '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';
-  var OPENAI_MODEL = 'gpt-4o-mini';
+  // Endpoint is hosted by Wix Velo:
+  //   https://www.coconutva.com/_functions/generateJD
+  // Backend file: backend/http-functions.js (must call openai.jsw)
+  //
+  // The Custom Element NEVER touches the OpenAI key. It just POSTs the
+  // form inputs and receives the enriched JSON back.
+  // =========================================================
+  var BACKEND_ENDPOINT = 'https://www.coconutva.com/_functions/generateJD';
   var SESSION_KEY = 'coconut_jd_generated';
 
-  function buildAIPrompt() {
+  function buildPayload() {
     var roleLabel = state.roleLabel || 'role';
     var roleData = getRoleData(state.role);
     var checked = Array.from(state.checkedResp);
@@ -1769,17 +1775,20 @@ class CoconutJDGenerator extends HTMLElement {
       if (f) subFlavorLabels.push(f.label);
     });
 
-    var inputs = {
+    return {
+      // Context for the AI (used by backend to build prompt)
       company: state.company,
       industry: state.industry,
       years_in_business: state.years,
       hiring_manager_role: state.position,
       role: roleLabel,
+      role_id: state.role,
       specializations: subFlavorLabels,
       experience_level: state.exp,
       checked_responsibilities: checked,
       free_text_extras: state.tasks,
       tools: Array.from(state.tools),
+      custom_tools: Array.from(state.customTools),
       english_level: state.english,
       raw_non_negotiables: {
         software: state.nonSoft,
@@ -1789,94 +1798,54 @@ class CoconutJDGenerator extends HTMLElement {
       },
       raw_nice_to_have: state.nice,
       time_zone: state.tzZone,
-      hours: state.hours
+      time_zone_window: state.tzWindow,
+      hours: state.hours,
+      count: state.count,
+      // Contact info (for later: webhook to Coconut OS)
+      contact_name: state.name,
+      contact_email: state.email,
+      // Meta
+      tier: state.tier,
+      submitted_at: new Date().toISOString()
     };
-
-    var systemPrompt = "You are a senior recruiter at Coconut, a premium remote staffing agency placing Filipino professionals at growing US/UK companies. You write polished job descriptions in Coconut's house voice: clear, action-oriented, tools-specific, no generic fluff. You take raw founder inputs and transform them into a professional job description that founders would pay $500 to have written. Always return STRICT JSON only, no markdown, no preamble.";
-
-    var userPrompt = "Generate a polished, recruiter-grade job description from these founder inputs:\n\n" +
-      JSON.stringify(inputs, null, 2) +
-      "\n\nReturn STRICT JSON with this exact shape:\n" +
-      "{\n" +
-      '  "about_paragraph": "3-4 sentence engaging intro about the role. Mention company name naturally, infer what the company does from industry+years, describe the broader mission this person joins. Sound human and specific, not template-y. End mentioning it being a fully remote role.",\n' +
-      '  "responsibilities": ["bullet 1", "bullet 2", ...],\n' +
-      '  "non_negotiables": ["filter 1", "filter 2", ...],\n' +
-      '  "nice_to_haves": ["bonus 1", "bonus 2", ...]\n' +
-      "}\n\n" +
-      "Rules for responsibilities (8-12 bullets):\n" +
-      "- Use checked_responsibilities as foundation. Refine wording, don't replace meaning.\n" +
-      "- Integrate free_text_extras polished into Coconut voice.\n" +
-      "- Each bullet starts with action verb, mentions specific tools when relevant, is ONE clear sentence.\n" +
-      "- Order from most important to least important.\n" +
-      "- Add 1-2 specialized bullets based on industry context (e.g. real estate → mention MLS; SaaS → mention product onboarding).\n" +
-      "- NEVER use markdown, NEVER use generic skill bullets like 'strong communication' (those go in non_negotiables).\n\n" +
-      "Rules for non_negotiables (4-6 items):\n" +
-      "- Take raw_non_negotiables values and polish each into a professional 'must-have' line.\n" +
-      "- Combine english_level naturally (e.g. 'Strong written and spoken English, comfortable on client calls').\n" +
-      "- Skip empty or 'n/a' values, don't include them.\n" +
-      "- Add 1-2 implied must-haves the founder forgot but matter for this role (reliability, time zone overlap, attention to detail tied to the role).\n" +
-      "- Each item is a clear filter a recruiter could screen against.\n\n" +
-      "Rules for nice_to_haves (3-5 items):\n" +
-      "- Use raw_nice_to_have if provided and polish it.\n" +
-      "- Infer 2-4 bonuses based on role + industry + tools (e.g. 'Experience with venture-backed startups' for tech roles, 'Familiarity with X tool' when relevant).\n" +
-      "- Make these aspirational, not redundant with non_negotiables.\n\n" +
-      "Rules for about_paragraph:\n" +
-      "- Use company name naturally, never in ALL CAPS or quoted.\n" +
-      "- Make industry feel specific, not labeled. Say 'a growing professional services firm' not 'a company in Professional Services'.\n" +
-      "- Sound like the founder wrote it warmly, not a template.";
-
-    return { system: systemPrompt, user: userPrompt };
   }
 
-  function callOpenAI() {
+  function callBackend() {
     return new Promise(function(resolve, reject) {
-      var prompts = buildAIPrompt();
+      var payload = buildPayload();
       var timedOut = false;
 
-      // Timeout via Promise.race (sandbox-safe, avoids AbortController issue)
+      // Timeout via Promise.race (sandbox-safe)
       var timeoutPromise = new Promise(function(_, rej) {
         setTimeout(function() {
           timedOut = true;
-          rej(new Error('Request timed out after 45 seconds. Please try again.'));
-        }, 45000);
+          rej(new Error('Request timed out after 60 seconds. Please try again.'));
+        }, 60000);
       });
 
-      var fetchPromise = fetch('https://api.openai.com/v1/chat/completions', {
+      var fetchPromise = fetch(BACKEND_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + OPENAI_KEY
-        },
-        body: JSON.stringify({
-          model: OPENAI_MODEL,
-          messages: [
-            { role: 'system', content: prompts.system },
-            { role: 'user', content: prompts.user }
-          ],
-          max_tokens: 1400,
-          temperature: 0.7,
-          response_format: { type: 'json_object' }
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       }).then(function(res) {
         if (timedOut) return;
         if (!res.ok) {
-          return res.json().then(function(err) {
-            var msg = (err && err.error && err.error.message) ? err.error.message : ('OpenAI API error: ' + res.status);
+          return res.text().then(function(txt) {
+            var msg = 'Backend error ' + res.status;
+            try {
+              var parsed = JSON.parse(txt);
+              if (parsed && parsed.error) msg = parsed.error;
+            } catch(e) { if (txt) msg = txt.slice(0, 200); }
             throw new Error(msg);
           });
         }
         return res.json();
       }).then(function(data) {
         if (timedOut) return;
-        var content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-        if (!content) throw new Error('Empty response from OpenAI');
-        var parsed;
-        try { parsed = JSON.parse(content); }
-        catch (e) { throw new Error('OpenAI returned invalid JSON'); }
-        if (!parsed.about_paragraph || !Array.isArray(parsed.responsibilities)) {
-          throw new Error('OpenAI returned malformed JSON structure');
+        if (!data || !data.about_paragraph || !Array.isArray(data.responsibilities)) {
+          throw new Error('Backend returned malformed response');
         }
-        return parsed;
+        return data;
       });
 
       Promise.race([fetchPromise, timeoutPromise]).then(resolve).catch(reject);
@@ -1901,8 +1870,8 @@ class CoconutJDGenerator extends HTMLElement {
     // Compute deterministic results (score, days, tier)
     computeResults();
 
-    // Call OpenAI for AI-enriched JD
-    callOpenAI().then(function(ai) {
+    // Call backend for AI-enriched JD (key stays server-side)
+    callBackend().then(function(ai) {
       state._aiAbout = ai.about_paragraph;
       state._aiResponsibilities = ai.responsibilities;
       state._aiNonNegotiables = Array.isArray(ai.non_negotiables) ? ai.non_negotiables : null;
@@ -1912,7 +1881,7 @@ class CoconutJDGenerator extends HTMLElement {
       renderJD();
       goToStep(7);
     }).catch(function(err) {
-      console.error('OpenAI call failed:', err);
+      console.error('Backend call failed:', err);
       state._aiAbout = null;
       state._aiResponsibilities = null;
       state._aiNonNegotiables = null;
