@@ -107,7 +107,7 @@ class CoconutJDGenerator extends HTMLElement {
     /* Surfaces */
     --cv-bg: #FFFFFF;
     --cv-bg-soft: #F7F7F4;
-    --cv-bg-cream: #F5F5F7;
+    --cv-bg-cream: #FFFFFF;
     --cv-bg-mint: #EAF5EE;
     /* Text */
     --cv-fg-1: #07152B;
