@@ -93,7 +93,7 @@ class CoconutJDGenerator extends HTMLElement {
     .cv-jd-details .dk { color: var(--cv-fg-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
   }
 
-:root {
+:host, :root {
     /* Core brand */
     --cv-navy-900: #07152B;
     --cv-navy-800: #0B1E3F;
