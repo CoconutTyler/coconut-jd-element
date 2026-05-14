@@ -1084,11 +1084,7 @@ ${fontLink}
 
         <!-- Export bar — additional ways to take the JD with them -->
         <div class="cv-export-bar">
-          <button class="cv-export-icon" data-export="plain" data-tooltip="Copy plain text" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
-            <span class="cv-export-label">Copy</span>
-          </button>
-          <button class="cv-export-icon" data-export="linkedin" data-tooltip="Copy for LinkedIn" type="button">
+          <button class="cv-export-icon" data-export="linkedin" data-tooltip="Copy & open LinkedIn" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
             <span class="cv-export-label">LinkedIn</span>
           </button>
@@ -2636,14 +2632,20 @@ ${fontLink}
     btn.addEventListener('click', function() {
       var kind = btn.dataset.export;
       try {
-        if (kind === 'plain') {
-          navigator.clipboard.writeText(buildPlainText()).then(
-            function() { flashIcon(btn, 'done'); },
-            function() { flashIcon(btn, 'error'); }
-          );
-        } else if (kind === 'linkedin') {
+        if (kind === 'linkedin') {
+          // Copy first, then open the LinkedIn post composer in a new tab.
+          // LinkedIn no longer accepts pre-filled post text via URL params (anti-spam),
+          // so the user pastes (Cmd/Ctrl+V) into the composer. The clipboard is ready.
           navigator.clipboard.writeText(buildLinkedInText()).then(
-            function() { flashIcon(btn, 'done'); },
+            function() {
+              flashIcon(btn, 'done');
+              // Brief delay so the user perceives the "Copied" feedback before the tab opens
+              setTimeout(function() {
+                // /feed/?shareActive=true opens the "Start a post" composer when logged in,
+                // or the LinkedIn login page otherwise (which redirects back after auth).
+                window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank', 'noopener,noreferrer');
+              }, 500);
+            },
             function() { flashIcon(btn, 'error'); }
           );
         } else if (kind === 'md') {
