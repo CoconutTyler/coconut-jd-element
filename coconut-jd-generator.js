@@ -1311,6 +1311,7 @@ ${fontLink}
 
   function updateSectionLocks() {
     var anyPrevComplete = true;
+    var firstUnlocked = null;
     SECTIONS.forEach(function(sec, idx) {
       var el = $(sec.id);
       if (idx === 0) {
@@ -1320,32 +1321,35 @@ ${fontLink}
       if (anyPrevComplete && SECTIONS[idx-1].complete()) {
         if (el.classList.contains('locked')) {
           el.classList.remove('locked');
-          // Wait for the unlock transition (~360ms) and layout to settle,
-          // then scroll the section to the very top of the form pane.
-          setTimeout(function() {
-            if (window.innerWidth < 960) {
-              // mobile: page scroll
-              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              return;
-            }
-            // desktop: scroll INSIDE the form pane.
-            // .cv-form-pane has position: relative, so el.offsetTop is
-            // the section's distance from the top of the pane's content box.
-            // This is robust even if a previous smooth-scroll is mid-animation.
-            var pane = root.querySelector('.cv-form-pane');
-            if (!pane) return;
-            // Use rAF so the browser has finished any pending layout work.
-            requestAnimationFrame(function() {
-              var top = Math.max(0, el.offsetTop - 8);
-              pane.scrollTo({ top: top, behavior: 'smooth' });
-            });
-          }, 480);
+          // Remember only the FIRST newly-unlocked section.
+          // Several sections can become available at once (e.g. choosing a role
+          // pre-checks default responsibilities + tools, which auto-completes
+          // section-work the moment exp is picked). We must scroll to the
+          // earliest one, not the deepest.
+          if (!firstUnlocked) firstUnlocked = el;
         }
       } else {
         anyPrevComplete = false;
         el.classList.add('locked');
       }
     });
+
+    // Single scroll per call, aimed at the first newly-unlocked section.
+    if (firstUnlocked) {
+      var target = firstUnlocked;
+      setTimeout(function() {
+        if (window.innerWidth < 960) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+        var pane = root.querySelector('.cv-form-pane');
+        if (!pane) return;
+        requestAnimationFrame(function() {
+          var top = Math.max(0, target.offsetTop - 8);
+          pane.scrollTo({ top: top, behavior: 'smooth' });
+        });
+      }, 480);
+    }
   }
 
   // =========================================================
