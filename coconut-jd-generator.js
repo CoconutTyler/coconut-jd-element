@@ -179,6 +179,7 @@ ${fontLink}
     height: 100%;
     overflow-y: auto;
     min-height: 0;
+    position: relative; /* makes .cv-section's offsetTop relative to this pane */
   }
   .cv-form-pane::-webkit-scrollbar { width: 6px; }
   .cv-form-pane::-webkit-scrollbar-track { background: transparent; }
@@ -1319,26 +1320,26 @@ ${fontLink}
       if (anyPrevComplete && SECTIONS[idx-1].complete()) {
         if (el.classList.contains('locked')) {
           el.classList.remove('locked');
-          // Wait for the unlock transition (~360ms) and any layout to settle,
+          // Wait for the unlock transition (~360ms) and layout to settle,
           // then scroll the section to the very top of the form pane.
           setTimeout(function() {
             if (window.innerWidth < 960) {
               // mobile: page scroll
               el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-              // desktop: scroll INSIDE the form pane.
-              // Using getBoundingClientRect for accuracy regardless of offsetParent.
-              var pane = root.querySelector('.cv-form-pane');
-              if (pane) {
-                var paneRect = pane.getBoundingClientRect();
-                var elRect = el.getBoundingClientRect();
-                // Position the section's top right against the pane's top edge,
-                // minus 8px breathing room so the eyebrow doesn't hug the border.
-                var targetScroll = pane.scrollTop + (elRect.top - paneRect.top) - 8;
-                pane.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
-              }
+              return;
             }
-          }, 420);
+            // desktop: scroll INSIDE the form pane.
+            // .cv-form-pane has position: relative, so el.offsetTop is
+            // the section's distance from the top of the pane's content box.
+            // This is robust even if a previous smooth-scroll is mid-animation.
+            var pane = root.querySelector('.cv-form-pane');
+            if (!pane) return;
+            // Use rAF so the browser has finished any pending layout work.
+            requestAnimationFrame(function() {
+              var top = Math.max(0, el.offsetTop - 8);
+              pane.scrollTo({ top: top, behavior: 'smooth' });
+            });
+          }, 480);
         }
       } else {
         anyPrevComplete = false;
