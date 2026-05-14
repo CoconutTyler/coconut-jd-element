@@ -450,33 +450,36 @@ ${fontLink}
     display: flex;
     align-items: baseline;
     justify-content: center;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-weight: 700;
+    gap: 8px;
+    margin-bottom: 18px;
     color: var(--cv-navy-800);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
+    font-variant-numeric: tabular-nums;
   }
   .cv-budget-display .cv-budget-val {
-    font-size: 17px;
-    color: var(--cv-green-700);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--cv-navy-800);
   }
   .cv-budget-display .cv-budget-dash {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--cv-fg-3);
-    font-weight: 500;
+    font-weight: 400;
   }
   .cv-budget-display .cv-budget-unit {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--cv-fg-3);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-left: 4px;
+    letter-spacing: 0.1em;
+    margin-left: 6px;
+    align-self: center;
   }
   .cv-budget-slider-wrap {
     position: relative;
-    height: 28px;
-    margin: 0 4px;
+    height: 24px;
+    margin: 0 10px;
+    /* Reserve room for the thumbs so they don't get clipped */
   }
   .cv-budget-track {
     position: absolute;
@@ -490,10 +493,12 @@ ${fontLink}
   }
   .cv-budget-track-fill {
     position: absolute;
-    top: 0;
-    height: 100%;
-    background: var(--cv-green-600);
+    top: 50%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--cv-green-600), var(--cv-green-700));
     border-radius: 99px;
+    transform: translateY(-50%);
+    transition: left 60ms linear, width 60ms linear;
   }
   /* Two overlapping range inputs — only their thumbs are visible */
   .cv-budget-slider {
@@ -512,30 +517,54 @@ ${fontLink}
   .cv-budget-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #FFFFFF;
-    border: 2.5px solid var(--cv-green-600);
-    cursor: pointer;
+    border: none;
+    cursor: grab;
     pointer-events: all;
-    box-shadow: 0 2px 6px rgba(7,21,43,0.15);
-    transition: transform 140ms var(--cv-ease), box-shadow 140ms var(--cv-ease);
+    box-shadow:
+      0 0 0 2px var(--cv-green-600) inset,
+      0 2px 6px rgba(7,21,43,0.12),
+      0 1px 2px rgba(7,21,43,0.08);
+    transition: transform 160ms var(--cv-ease), box-shadow 160ms var(--cv-ease);
     margin-top: 0;
   }
   .cv-budget-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-    box-shadow: 0 3px 10px rgba(7,21,43,0.2);
+    transform: scale(1.12);
+    box-shadow:
+      0 0 0 2px var(--cv-green-700) inset,
+      0 4px 12px rgba(80,176,128,0.35),
+      0 2px 4px rgba(7,21,43,0.1);
+  }
+  .cv-budget-slider:active::-webkit-slider-thumb,
+  .cv-budget-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.18);
+    box-shadow:
+      0 0 0 2px var(--cv-green-700) inset,
+      0 0 0 6px rgba(80,176,128,0.18),
+      0 4px 14px rgba(80,176,128,0.4);
   }
   .cv-budget-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #FFFFFF;
-    border: 2.5px solid var(--cv-green-600);
-    cursor: pointer;
+    border: 2px solid var(--cv-green-600);
+    cursor: grab;
     pointer-events: all;
-    box-shadow: 0 2px 6px rgba(7,21,43,0.15);
+    box-shadow: 0 2px 6px rgba(7,21,43,0.12);
+    transition: transform 160ms var(--cv-ease), box-shadow 160ms var(--cv-ease);
+  }
+  .cv-budget-slider::-moz-range-thumb:hover {
+    transform: scale(1.12);
+    box-shadow: 0 4px 12px rgba(80,176,128,0.35);
+  }
+  .cv-budget-slider::-moz-range-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.18);
   }
   /* Hide the default track of both ranges (we render our own) */
   .cv-budget-slider::-webkit-slider-runnable-track {
@@ -549,17 +578,19 @@ ${fontLink}
   .cv-budget-bounds {
     display: flex;
     justify-content: space-between;
-    margin-top: 4px;
-    font-size: 11px;
-    font-weight: 600;
+    margin-top: 10px;
+    font-size: 10.5px;
+    font-weight: 700;
     color: var(--cv-fg-3);
-    padding: 0 4px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0 2px;
   }
   .cv-budget-checkbox-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 16px;
     cursor: pointer;
     user-select: none;
   }
