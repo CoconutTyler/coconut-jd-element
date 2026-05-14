@@ -1535,12 +1535,13 @@ ${fontLink}
     <button class="cv-modal-close" id="leadModalClose" type="button" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
-    <!-- Idle state — email form -->
+    <!-- Idle state — name + email form -->
     <div id="leadModalForm">
       <p class="cv-modal-eyebrow">Find me candidates</p>
-      <h2 id="leadModalTitle">Drop your email and we'll match candidates to your JD.</h2>
+      <h2 id="leadModalTitle">Drop your details and we'll match candidates to your JD.</h2>
       <p>We'll send you a shortlist of vetted, dedicated talent within 24 hours. No commitment.</p>
       <div class="cv-modal-form">
+        <input type="text" class="cv-modal-input" id="leadNameInput" placeholder="Your name" autocomplete="name" />
         <input type="email" class="cv-modal-input" id="leadEmailInput" placeholder="you@company.com" autocomplete="email" />
         <button type="button" class="cv-modal-submit" id="leadSubmitBtn">
           <span id="leadSubmitText">Send my JD &amp; find candidates</span>
@@ -1548,7 +1549,7 @@ ${fontLink}
         </button>
       </div>
       <p class="cv-modal-error" id="leadErrorMsg" hidden></p>
-      <p class="cv-modal-fine">We'll never share your email or spam you. We just need somewhere to send the shortlist.</p>
+      <p class="cv-modal-fine">We'll never share your details or spam you. We just need somewhere to send the shortlist.</p>
     </div>
     <!-- Success state -->
     <div id="leadModalSuccess" class="cv-modal-success" hidden>
@@ -3291,9 +3292,11 @@ ${fontLink}
     $('leadModalForm').hidden = false;
     $('leadModalSuccess').hidden = true;
     $('leadErrorMsg').hidden = true;
+    $('leadNameInput').value = '';
     $('leadEmailInput').value = '';
+    $('leadNameInput').classList.remove('error');
     $('leadEmailInput').classList.remove('error');
-    setTimeout(function() { $('leadEmailInput').focus(); }, 80);
+    setTimeout(function() { $('leadNameInput').focus(); }, 80);
   }
   function closeLeadModal() {
     $('leadModal').hidden = true;
@@ -3317,21 +3320,26 @@ ${fontLink}
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
   }
 
-  function showLeadError(msg) {
+  // Highlight the right input when validation fails; message stays separate.
+  function showLeadError(msg, which) {
     var err = $('leadErrorMsg');
     err.textContent = msg;
     err.hidden = false;
-    $('leadEmailInput').classList.add('error');
+    if (which === 'name') $('leadNameInput').classList.add('error');
+    else $('leadEmailInput').classList.add('error');
   }
 
   function submitLead() {
     if (leadSubmitting) return;
+    var name = $('leadNameInput').value.trim();
     var email = $('leadEmailInput').value.trim();
-    if (!email) { showLeadError('Please enter your email.'); return; }
-    if (!isValidEmail(email)) { showLeadError('That email doesn\'t look quite right.'); return; }
+    if (!name) { showLeadError('Please enter your name.', 'name'); return; }
+    if (!email) { showLeadError('Please enter your email.', 'email'); return; }
+    if (!isValidEmail(email)) { showLeadError('That email doesn\'t look quite right.', 'email'); return; }
 
     leadSubmitting = true;
     $('leadErrorMsg').hidden = true;
+    $('leadNameInput').classList.remove('error');
     $('leadEmailInput').classList.remove('error');
     var btn = $('leadSubmitBtn');
     var btnText = $('leadSubmitText');
@@ -3340,6 +3348,7 @@ ${fontLink}
     btnText.textContent = 'Sending...';
 
     var payload = buildPayload();
+    payload.name = name;
     payload.email = email;
     payload.campaign = state._campaign || 'jd_unknown';
     payload.event_type = 'find_candidates';
@@ -3351,7 +3360,7 @@ ${fontLink}
       leadSubmitting = false;
       btn.disabled = false;
       btnText.textContent = originalText;
-      showLeadError('Request took too long. Please try again.');
+      showLeadError('Request took too long. Please try again.', 'email');
     }, 30000);
 
     fetch(LEAD_ENDPOINT, {
@@ -3380,13 +3389,22 @@ ${fontLink}
       leadSubmitting = false;
       btn.disabled = false;
       btnText.textContent = originalText;
-      showLeadError('Something went wrong. Please try again or email us directly.');
+      showLeadError('Something went wrong. Please try again or email us directly.', 'email');
     });
   }
 
   $('leadSubmitBtn').addEventListener('click', submitLead);
+  // Pressing Enter on either input submits the form
+  $('leadNameInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); $('leadEmailInput').focus(); }
+  });
   $('leadEmailInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') { e.preventDefault(); submitLead(); }
+  });
+  // Clear error visual state when user starts typing again
+  $('leadNameInput').addEventListener('input', function() {
+    this.classList.remove('error');
+    $('leadErrorMsg').hidden = true;
   });
   $('leadEmailInput').addEventListener('input', function() {
     this.classList.remove('error');
