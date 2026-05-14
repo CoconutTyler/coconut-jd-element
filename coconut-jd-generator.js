@@ -443,6 +443,143 @@ ${fontLink}
     .cv-preview-pane { padding: 24px 20px; border-radius: var(--cv-radius-lg); }
   }
 
+  /* ============================================
+     BUDGET SLIDER — dual-handle range
+     ============================================ */
+  .cv-budget-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: var(--cv-navy-800);
+    letter-spacing: -0.01em;
+  }
+  .cv-budget-display .cv-budget-val {
+    font-size: 17px;
+    color: var(--cv-green-700);
+  }
+  .cv-budget-display .cv-budget-dash {
+    font-size: 13px;
+    color: var(--cv-fg-3);
+    font-weight: 500;
+  }
+  .cv-budget-display .cv-budget-unit {
+    font-size: 11.5px;
+    color: var(--cv-fg-3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-left: 4px;
+  }
+  .cv-budget-slider-wrap {
+    position: relative;
+    height: 28px;
+    margin: 0 4px;
+  }
+  .cv-budget-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--cv-border);
+    border-radius: 99px;
+    transform: translateY(-50%);
+  }
+  .cv-budget-track-fill {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: var(--cv-green-600);
+    border-radius: 99px;
+  }
+  /* Two overlapping range inputs — only their thumbs are visible */
+  .cv-budget-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    margin: 0;
+    pointer-events: none;
+  }
+  .cv-budget-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2.5px solid var(--cv-green-600);
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: 0 2px 6px rgba(7,21,43,0.15);
+    transition: transform 140ms var(--cv-ease), box-shadow 140ms var(--cv-ease);
+    margin-top: 0;
+  }
+  .cv-budget-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 10px rgba(7,21,43,0.2);
+  }
+  .cv-budget-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2.5px solid var(--cv-green-600);
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: 0 2px 6px rgba(7,21,43,0.15);
+  }
+  /* Hide the default track of both ranges (we render our own) */
+  .cv-budget-slider::-webkit-slider-runnable-track {
+    background: transparent;
+    border: none;
+  }
+  .cv-budget-slider::-moz-range-track {
+    background: transparent;
+    border: none;
+  }
+  .cv-budget-bounds {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cv-fg-3);
+    padding: 0 4px;
+  }
+  .cv-budget-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .cv-budget-check {
+    width: 17px; height: 17px; flex-shrink: 0;
+    border: 1.5px solid var(--cv-border);
+    border-radius: 5px;
+    background: var(--cv-bg);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 140ms var(--cv-ease);
+  }
+  .cv-budget-check svg { width: 11px; height: 11px; color: var(--cv-fg-inverse); opacity: 0; }
+  .cv-budget-checkbox-row.on .cv-budget-check { background: var(--cv-green-600); border-color: var(--cv-green-600); }
+  .cv-budget-checkbox-row.on .cv-budget-check svg { opacity: 1; }
+  .cv-budget-checkbox-row .lbl {
+    font-size: 13px;
+    color: var(--cv-fg-2);
+    font-weight: 500;
+  }
+
   /* Empty state — skeleton */
   .cv-preview-empty {
     text-align: center;
@@ -657,6 +794,178 @@ ${fontLink}
     opacity: 1;
   }
 
+  /* ============================================
+     LEAD CAPTURE MODAL — opens when user clicks "Find me candidates"
+     ============================================ */
+  .cv-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 21, 43, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 999;
+    animation: modalFade 200ms var(--cv-ease-out);
+  }
+  @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+  .cv-modal {
+    background: var(--cv-bg);
+    border-radius: var(--cv-radius-xl);
+    box-shadow: 0 24px 48px rgba(7,21,43,0.25);
+    width: 100%;
+    max-width: 440px;
+    padding: 32px;
+    text-align: center;
+    animation: modalSlide 280ms var(--cv-ease-out);
+    position: relative;
+  }
+  @keyframes modalSlide {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: none; }
+  }
+  .cv-modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--cv-fg-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 140ms var(--cv-ease);
+  }
+  .cv-modal-close:hover { background: var(--cv-bg-soft); color: var(--cv-navy-800); }
+  .cv-modal-close svg { width: 14px; height: 14px; }
+  .cv-modal-eyebrow {
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cv-green-700);
+    margin: 0 0 10px;
+  }
+  .cv-modal h2 {
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: var(--cv-navy-800);
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .cv-modal p {
+    font-size: 14px;
+    color: var(--cv-fg-3);
+    margin: 0 0 20px;
+    line-height: 1.55;
+  }
+  .cv-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cv-modal-input {
+    padding: 13px 15px;
+    border: 1.5px solid var(--cv-border);
+    border-radius: var(--cv-radius-md);
+    background: var(--cv-bg);
+    color: var(--cv-fg-1);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 180ms var(--cv-ease), box-shadow 180ms var(--cv-ease);
+    text-align: center;
+  }
+  .cv-modal-input:focus {
+    border-color: var(--cv-green-600);
+    box-shadow: 0 0 0 3px rgba(80,176,128,0.14);
+  }
+  .cv-modal-input.error {
+    border-color: var(--cv-error);
+    box-shadow: 0 0 0 3px rgba(229,75,75,0.12);
+  }
+  .cv-modal-submit {
+    background: var(--cv-green-600);
+    color: var(--cv-fg-inverse);
+    border: none;
+    border-radius: var(--cv-radius-pill);
+    padding: 13px 22px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 180ms var(--cv-ease);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: var(--cv-shadow-sm);
+  }
+  .cv-modal-submit:hover {
+    background: var(--cv-green-700);
+    box-shadow: var(--cv-shadow-md);
+    transform: translateY(-1px);
+  }
+  .cv-modal-submit:disabled {
+    background: var(--cv-fg-3);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+  }
+  .cv-modal-submit svg { width: 13px; height: 13px; }
+  .cv-modal-error {
+    font-size: 12.5px;
+    color: var(--cv-error);
+    margin: 8px 0 0;
+    text-align: center;
+  }
+  .cv-modal-fine {
+    font-size: 11.5px;
+    color: var(--cv-fg-3);
+    margin: 14px 0 0;
+    line-height: 1.5;
+  }
+  /* Success state */
+  .cv-modal-success {
+    text-align: center;
+    animation: modalSlide 280ms var(--cv-ease-out);
+  }
+  .cv-modal-success-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--cv-green-100);
+    color: var(--cv-green-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .cv-modal-success-icon svg { width: 24px; height: 24px; }
+  .cv-modal-success h2 {
+    color: var(--cv-navy-800);
+    margin-bottom: 8px;
+  }
+  .cv-modal-success p { margin-bottom: 18px; }
+  .cv-modal-done-btn {
+    background: var(--cv-navy-800);
+    color: var(--cv-fg-inverse);
+    border: none;
+    border-radius: var(--cv-radius-pill);
+    padding: 11px 24px;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: all 180ms var(--cv-ease);
+  }
+  .cv-modal-done-btn:hover { background: var(--cv-navy-700); }
+
   /* Buttons */
   .cv-btn {
     font-family: var(--cv-font);
@@ -773,7 +1082,7 @@ ${fontLink}
     font-size: 11.5px;
     color: var(--cv-fg-3);
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.7;
   }
   .cv-preview-footer .restart {
     background: none; border: none; color: var(--cv-fg-3);
@@ -782,6 +1091,37 @@ ${fontLink}
     padding: 0;
   }
   .cv-preview-footer .restart:hover { color: var(--cv-navy-800); }
+  /* AI status line inside footer — discrete, doesn't compete with the headline */
+  .cv-footer-ai {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cv-fg-3);
+  }
+  .cv-footer-ai-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--cv-green-600);
+    display: inline-block;
+  }
+  .cv-footer-ai.loading .cv-footer-ai-dot {
+    background: var(--cv-fg-3);
+    animation: aiPulse 1.2s ease-in-out infinite;
+  }
+  .cv-footer-ai.error { color: #B8503A; }
+  .cv-footer-ai.error .cv-footer-ai-dot { background: #B8503A; }
+  .cv-footer-ai-regen {
+    background: transparent; border: none; padding: 0 0 0 2px;
+    color: inherit; cursor: pointer; opacity: 0.6;
+    display: inline-flex; align-items: center;
+    transition: opacity 140ms var(--cv-ease);
+  }
+  .cv-footer-ai-regen:hover { opacity: 1; }
+  .cv-footer-ai-regen svg { width: 10px; height: 10px; }
+  .cv-footer-ai-regen.spinning svg { animation: aiSpin 1s linear infinite; }
+  .cv-footer-sep { opacity: 0.5; padding: 0 6px; }
 
   /* Hint when JD almost ready */
   .cv-preview-hint {
@@ -1029,6 +1369,32 @@ ${fontLink}
           <option>24/7 coverage with shifts</option>
         </select>
       </div>
+
+      <div class="cv-field" style="margin-top: 18px;">
+        <label class="cv-label">Budget per month <span class="cv-label-optional">(optional)</span></label>
+        <div class="cv-budget-display">
+          <span class="cv-budget-val" id="budgetMinDisplay">$3,000</span>
+          <span class="cv-budget-dash">–</span>
+          <span class="cv-budget-val" id="budgetMaxDisplay">$5,000</span>
+          <span class="cv-budget-unit">/ month</span>
+        </div>
+        <div class="cv-budget-slider-wrap">
+          <div class="cv-budget-track"></div>
+          <div class="cv-budget-track-fill" id="budgetTrackFill"></div>
+          <input type="range" class="cv-budget-slider" id="budgetMin" min="1000" max="20000" step="500" value="3000" />
+          <input type="range" class="cv-budget-slider" id="budgetMax" min="1000" max="20000" step="500" value="5000" />
+        </div>
+        <div class="cv-budget-bounds">
+          <span>$1K</span>
+          <span>$20K</span>
+        </div>
+        <div class="cv-budget-checkbox-row on" id="budgetShowRow">
+          <span class="cv-budget-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="lbl">Show budget in the JD</span>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -1055,13 +1421,6 @@ ${fontLink}
     <div class="cv-preview-content" id="previewContent" hidden>
       <!-- Hero (appears when JD is ready) -->
       <div class="cv-result-hero" id="resultHero" hidden>
-        <div class="cv-ai-badge" id="aiBadge" hidden>
-          <span class="cv-ai-badge-dot"></span>
-          <span id="aiBadgeText">Enhanced with AI</span>
-          <button class="cv-ai-regen" id="aiRegenBtn" type="button" title="Regenerate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          </button>
-        </div>
         <div class="cv-result-stats">
           <span id="resStat1">— Match</span>
           <span class="dot">·</span>
@@ -1072,10 +1431,10 @@ ${fontLink}
         <h3 class="cv-result-headline" id="resHeadline">Your role is ready.</h3>
         <p class="cv-result-sub" id="resSub">Based on your inputs, Coconut typically fills this role in a few days with vetted, dedicated talent.</p>
         <div class="cv-result-cta-row">
-          <a href="#" target="_blank" rel="noopener" class="cv-btn cv-btn-primary" id="ctaCalendly">
+          <button type="button" class="cv-btn cv-btn-primary" id="ctaFindCandidates">
             Find me candidates
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+          </button>
           <button class="cv-btn cv-btn-navy" id="ctaCopy">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
             Copy JD
@@ -1111,8 +1470,49 @@ ${fontLink}
 
       <!-- Footer -->
       <div class="cv-preview-footer" id="previewFooter" hidden>
+        <span class="cv-footer-ai" id="footerAi" hidden>
+          <span class="cv-footer-ai-dot"></span>
+          <span id="footerAiText">Enhanced with AI</span>
+          <button class="cv-footer-ai-regen" id="aiRegenBtn" type="button" title="Regenerate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+        </span>
+        <span class="cv-footer-sep" id="footerSep" hidden>·</span>
         Built in real-time as you typed. <button class="restart" id="restartBtn">Start over</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LEAD CAPTURE MODAL ============ -->
+<div class="cv-modal-backdrop" id="leadModal" hidden>
+  <div class="cv-modal" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle">
+    <button class="cv-modal-close" id="leadModalClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <!-- Idle state — email form -->
+    <div id="leadModalForm">
+      <p class="cv-modal-eyebrow">Find me candidates</p>
+      <h2 id="leadModalTitle">Drop your email and we'll match candidates to your JD.</h2>
+      <p>We'll send you a shortlist of vetted, dedicated talent within 24 hours. No commitment.</p>
+      <div class="cv-modal-form">
+        <input type="email" class="cv-modal-input" id="leadEmailInput" placeholder="you@company.com" autocomplete="email" />
+        <button type="button" class="cv-modal-submit" id="leadSubmitBtn">
+          <span id="leadSubmitText">Send my JD &amp; find candidates</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <p class="cv-modal-error" id="leadErrorMsg" hidden></p>
+      <p class="cv-modal-fine">We'll never share your email or spam you. We just need somewhere to send the shortlist.</p>
+    </div>
+    <!-- Success state -->
+    <div id="leadModalSuccess" class="cv-modal-success" hidden>
+      <div class="cv-modal-success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>You're in. We're on it.</h2>
+      <p>We received your job description. Expect a shortlist of matched candidates in your inbox within 24 hours.</p>
+      <button class="cv-modal-done-btn" id="leadDoneBtn" type="button">Done</button>
     </div>
   </div>
 </div>
@@ -1348,6 +1748,8 @@ ${fontLink}
     english: '', nice: '',
     // Section 5
     hours: '', tzZone: '', tzWindow: '',
+    // Budget (Section 5)
+    budgetMin: 3000, budgetMax: 5000, budgetShow: true,
     // AI enrichment
     _aiAbout: null,
     _aiResponsibilities: null,
@@ -1767,6 +2169,63 @@ ${fontLink}
   }
 
   // =========================================================
+  // BUDGET — dual-handle slider with min/max coupling.
+  // The two range inputs are visually overlaid; we enforce
+  // min ≤ max - step and render a custom track fill on top.
+  // =========================================================
+  function formatBudget(v) {
+    var n = parseInt(v, 10);
+    if (n >= 1000) {
+      if (n % 1000 === 0) return '$' + (n / 1000) + 'K';
+      return '$' + (n / 1000).toFixed(1).replace('.0', '') + 'K';
+    }
+    return '$' + n;
+  }
+  function refreshBudgetUI() {
+    var minEl = $('budgetMin');
+    var maxEl = $('budgetMax');
+    var min = parseInt(minEl.value, 10);
+    var max = parseInt(maxEl.value, 10);
+    var lo = parseInt(minEl.min, 10);
+    var hi = parseInt(minEl.max, 10);
+    var range = hi - lo;
+    var leftPct = ((min - lo) / range) * 100;
+    var rightPct = ((max - lo) / range) * 100;
+    var fill = $('budgetTrackFill');
+    if (fill) {
+      fill.style.left = leftPct + '%';
+      fill.style.width = (rightPct - leftPct) + '%';
+    }
+    $('budgetMinDisplay').textContent = formatBudget(min);
+    $('budgetMaxDisplay').textContent = formatBudget(max);
+    state.budgetMin = min;
+    state.budgetMax = max;
+  }
+  function onBudgetChange(which) {
+    var minEl = $('budgetMin');
+    var maxEl = $('budgetMax');
+    var min = parseInt(minEl.value, 10);
+    var max = parseInt(maxEl.value, 10);
+    var step = parseInt(minEl.step, 10);
+    if (which === 'min' && min > max - step) {
+      minEl.value = Math.max(parseInt(minEl.min, 10), max - step);
+    } else if (which === 'max' && max < min + step) {
+      maxEl.value = Math.min(parseInt(maxEl.max, 10), min + step);
+    }
+    refreshBudgetUI();
+    onStateChange();
+  }
+  $('budgetMin').addEventListener('input', function() { onBudgetChange('min'); });
+  $('budgetMax').addEventListener('input', function() { onBudgetChange('max'); });
+  $('budgetShowRow').addEventListener('click', function() {
+    state.budgetShow = !state.budgetShow;
+    this.classList.toggle('on', state.budgetShow);
+    onStateChange();
+  });
+  // Initial render of the track fill
+  refreshBudgetUI();
+
+  // =========================================================
   // STATE CHANGE → update locks + re-render preview + trigger AI if ready
   // =========================================================
   var renderTimer = null;
@@ -1799,7 +2258,8 @@ ${fontLink}
       state.english,
       state.nonSoft, state.nonRole, state.nonIndustry, state.nonSoftSkill,
       state.nice,
-      state.hours, state.tzZone, state.tzWindow
+      state.hours, state.tzZone, state.tzWindow,
+      state.budgetMin, state.budgetMax, state.budgetShow
     ].join('§');
   }
 
@@ -1833,6 +2293,9 @@ ${fontLink}
       raw_nice_to_have: state.nice,
       time_zone: state.tzZone,
       time_zone_window: state.tzWindow,
+      budget_min: state.budgetMin,
+      budget_max: state.budgetMax,
+      budget_show: state.budgetShow,
       hours: state.hours,
       count: state.count,
       tier: state.tier,
@@ -2113,34 +2576,36 @@ ${fontLink}
       $('resHeadline').textContent = 'Your ' + (state.roleLabel || 'role') + ' job description is ready.';
       $('resSub').textContent = 'Based on your inputs, Coconut typically fills this role in ' + results.days + ' days with vetted, dedicated talent.';
 
-      // AI badge state
-      var badge = $('aiBadge');
-      var badgeText = $('aiBadgeText');
+      // AI status — now lives in the footer (Tyler's feedback: keep hero clean,
+      // make AI feel like a finishing touch, not the headline).
+      var ai = $('footerAi');
+      var aiText = $('footerAiText');
+      var sep = $('footerSep');
       var regenBtn = $('aiRegenBtn');
       if (state._aiStatus === 'loading') {
-        badge.hidden = false;
-        badge.className = 'cv-ai-badge loading';
-        badgeText.textContent = 'Enhancing with AI...';
+        ai.hidden = false; sep.hidden = false;
+        ai.className = 'cv-footer-ai loading';
+        aiText.textContent = 'Enhancing with AI...';
         regenBtn.classList.add('spinning');
       } else if (state._aiStatus === 'success') {
-        badge.hidden = false;
-        badge.className = 'cv-ai-badge';
-        badgeText.textContent = 'Enhanced with AI';
+        ai.hidden = false; sep.hidden = false;
+        ai.className = 'cv-footer-ai';
+        aiText.textContent = 'Enhanced with AI';
         regenBtn.classList.remove('spinning');
       } else if (state._aiStatus === 'error') {
-        badge.hidden = false;
-        badge.className = 'cv-ai-badge error';
-        badgeText.textContent = 'AI unavailable — using template';
+        ai.hidden = false; sep.hidden = false;
+        ai.className = 'cv-footer-ai error';
+        aiText.textContent = 'AI unavailable — using template';
         regenBtn.classList.remove('spinning');
       } else {
-        badge.hidden = true;
+        ai.hidden = true; sep.hidden = true;
       }
 
-      // Calendly UTM
+      // Campaign tag — passed to the backend on lead submit (for later attribution).
+      // Kept on state so the modal flow can grab it at submit time.
       var roleSlug = (state.roleLabel || 'role').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
       var subSlugs = Array.from(state.subFlavors).join('_');
-      var campaign = 'jd_' + roleSlug + (subSlugs ? '_' + subSlugs : '');
-      $('ctaCalendly').href = 'https://calendly.com/adell-coconutva/coconut-discovery-call?utm_source=jd_generator&utm_medium=tool&utm_campaign=' + encodeURIComponent(campaign);
+      state._campaign = 'jd_' + roleSlug + (subSlugs ? '_' + subSlugs : '');
     } else {
       hero.hidden = true;
       footer.hidden = true;
@@ -2235,11 +2700,17 @@ ${fontLink}
 
     // Details
     if (state.hours || state.tzZone || state.tzWindow) {
+      var budgetLine = '';
+      if (state.budgetShow) {
+        budgetLine = '<div class="dk">Budget</div><div class="dv">' +
+          formatBudget(state.budgetMin) + '–' + formatBudget(state.budgetMax) + ' / month</div>';
+      }
       html += '<div class="cv-jd-section">' +
         '<div class="cv-jd-h3">The details ' + copyBtnHtml('details') + '</div>' +
         '<div class="cv-jd-details" id="copyTarget-details">' +
         (state.hours ? '<div class="dk">Hours</div><div class="dv">' + escapeHtml(state.hours) + '</div>' : '') +
         (state.tzZone ? '<div class="dk">Time zone</div><div class="dv">' + escapeHtml(state.tzZone) + (state.tzWindow ? ' · ' + escapeHtml(state.tzWindow) : '') + '</div>' : '') +
+        budgetLine +
         '<div class="dk">Location</div><div class="dv">Remote</div>' +
         '</div></div>';
     }
@@ -2258,6 +2729,8 @@ ${fontLink}
           var details = [];
           if (state.hours) details.push('Hours: ' + state.hours);
           if (state.tzZone) details.push('Time zone: ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
+          var bl = jdBudgetLine();
+          if (bl) details.push('Budget: ' + bl);
           details.push('Location: Remote');
           text = details.join('\n');
         } else {
@@ -2301,6 +2774,12 @@ ${fontLink}
     if (state.tzZone) p.push(state.tzZone);
     return p;
   }
+  // Budget formatted for inclusion in exports/plain text/etc.
+  // Returns empty string when the user toggled "Show budget in JD" off.
+  function jdBudgetLine() {
+    if (!state.budgetShow) return '';
+    return formatBudget(state.budgetMin) + '–' + formatBudget(state.budgetMax) + ' / month';
+  }
 
   // Plain text version (used by Copy JD button and Copy plain)
   function buildPlainText() {
@@ -2337,6 +2816,8 @@ ${fontLink}
     lines.push('THE DETAILS');
     if (state.hours) lines.push('Hours: ' + state.hours);
     if (state.tzZone) lines.push('Time zone: ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
+    var bl1 = jdBudgetLine();
+    if (bl1) lines.push('Budget: ' + bl1);
     lines.push('Location: Remote');
     return lines.join('\n');
   }
@@ -2382,6 +2863,8 @@ ${fontLink}
     lines.push('');
     if (state.hours) lines.push('- **Hours:** ' + state.hours);
     if (state.tzZone) lines.push('- **Time zone:** ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
+    var bl2 = jdBudgetLine();
+    if (bl2) lines.push('- **Budget:** ' + bl2);
     lines.push('- **Location:** Remote');
     return lines.join('\n');
   }
@@ -2432,6 +2915,8 @@ ${fontLink}
     }
     lines.push(toLinkedInBold('Details') + ': ' + jdSubtitleParts().join(' · ') +
       (state.tzWindow ? ' · ' + state.tzWindow : ''));
+    var bl3 = jdBudgetLine();
+    if (bl3) lines.push(toLinkedInBold('Budget') + ': ' + bl3);
     lines.push('');
     lines.push('—');
     lines.push('Need to hire someone like this? Coconut Virtual Professionals can help → https://www.coconutva.com');
@@ -2473,6 +2958,8 @@ ${fontLink}
     sections += '<h2 style="color:#0B1E3F;font-size:14pt;margin-top:14pt;margin-bottom:6pt;">The details</h2><ul>';
     if (state.hours) sections += '<li><strong>Hours:</strong> ' + escapeHtml(state.hours) + '</li>';
     if (state.tzZone) sections += '<li><strong>Time zone:</strong> ' + escapeHtml(state.tzZone) + (state.tzWindow ? ' · ' + escapeHtml(state.tzWindow) : '') + '</li>';
+    var bl4 = jdBudgetLine();
+    if (bl4) sections += '<li><strong>Budget:</strong> ' + escapeHtml(bl4) + '</li>';
     sections += '<li><strong>Location:</strong> Remote</li>';
     sections += '</ul>';
 
@@ -2602,6 +3089,8 @@ ${fontLink}
       var detailItems = [];
       if (state.hours) detailItems.push('Hours: ' + state.hours);
       if (state.tzZone) detailItems.push('Time zone: ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
+      var bl5 = jdBudgetLine();
+      if (bl5) detailItems.push('Budget: ' + bl5);
       detailItems.push('Location: Remote');
       bulletList(detailItems);
 
@@ -2680,6 +3169,124 @@ ${fontLink}
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Copied!';
       setTimeout(function() { btn.innerHTML = original; }, 1800);
     });
+  });
+
+  // =========================================================
+  // LEAD CAPTURE MODAL — replaces the Calendly link
+  // Flow:
+  //   1. User clicks "Find me candidates"
+  //   2. Modal asks for email
+  //   3. Submit → POST /captureLead with full JD payload + email
+  //   4. Show success state ("we'll be in touch within 24h")
+  // =========================================================
+  var LEAD_ENDPOINT = 'https://www.coconutva.com/_functions/captureLead';
+  var leadSubmitting = false;
+
+  function openLeadModal() {
+    $('leadModal').hidden = false;
+    $('leadModalForm').hidden = false;
+    $('leadModalSuccess').hidden = true;
+    $('leadErrorMsg').hidden = true;
+    $('leadEmailInput').value = '';
+    $('leadEmailInput').classList.remove('error');
+    setTimeout(function() { $('leadEmailInput').focus(); }, 80);
+  }
+  function closeLeadModal() {
+    $('leadModal').hidden = true;
+  }
+
+  $('ctaFindCandidates').addEventListener('click', openLeadModal);
+  $('leadModalClose').addEventListener('click', closeLeadModal);
+  $('leadDoneBtn').addEventListener('click', closeLeadModal);
+
+  // Close on backdrop click (but not inside the modal)
+  $('leadModal').addEventListener('click', function(e) {
+    if (e.target === this) closeLeadModal();
+  });
+
+  // ESC to close
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !$('leadModal').hidden) closeLeadModal();
+  });
+
+  function isValidEmail(s) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+  }
+
+  function showLeadError(msg) {
+    var err = $('leadErrorMsg');
+    err.textContent = msg;
+    err.hidden = false;
+    $('leadEmailInput').classList.add('error');
+  }
+
+  function submitLead() {
+    if (leadSubmitting) return;
+    var email = $('leadEmailInput').value.trim();
+    if (!email) { showLeadError('Please enter your email.'); return; }
+    if (!isValidEmail(email)) { showLeadError('That email doesn\'t look quite right.'); return; }
+
+    leadSubmitting = true;
+    $('leadErrorMsg').hidden = true;
+    $('leadEmailInput').classList.remove('error');
+    var btn = $('leadSubmitBtn');
+    var btnText = $('leadSubmitText');
+    var originalText = btnText.textContent;
+    btn.disabled = true;
+    btnText.textContent = 'Sending...';
+
+    var payload = buildPayload();
+    payload.email = email;
+    payload.campaign = state._campaign || 'jd_unknown';
+    payload.event_type = 'find_candidates';
+    payload.jd_plain_text = buildPlainText();
+
+    var timedOut = false;
+    var timeout = setTimeout(function() {
+      timedOut = true;
+      leadSubmitting = false;
+      btn.disabled = false;
+      btnText.textContent = originalText;
+      showLeadError('Request took too long. Please try again.');
+    }, 30000);
+
+    fetch(LEAD_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(res) {
+      if (timedOut) return;
+      clearTimeout(timeout);
+      if (!res.ok) {
+        return res.text().then(function(t) { throw new Error(t || 'Server error'); });
+      }
+      return res.json().catch(function() { return {}; });
+    }).then(function() {
+      if (timedOut) return;
+      leadSubmitting = false;
+      btn.disabled = false;
+      btnText.textContent = originalText;
+      // Show success state
+      $('leadModalForm').hidden = true;
+      $('leadModalSuccess').hidden = false;
+    }).catch(function(err) {
+      if (timedOut) return;
+      clearTimeout(timeout);
+      console.error('Lead capture failed:', err);
+      leadSubmitting = false;
+      btn.disabled = false;
+      btnText.textContent = originalText;
+      showLeadError('Something went wrong. Please try again or email us directly.');
+    });
+  }
+
+  $('leadSubmitBtn').addEventListener('click', submitLead);
+  $('leadEmailInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); submitLead(); }
+  });
+  $('leadEmailInput').addEventListener('input', function() {
+    this.classList.remove('error');
+    $('leadErrorMsg').hidden = true;
   });
 
   // =========================================================
