@@ -1403,8 +1403,20 @@ ${fontLink}
         </select>
       </div>
 
+      <div class="cv-field">
+        <label class="cv-label">Where will they work?</label>
+        <div class="cv-pills" id="locationTypePills">
+          <span class="cv-pill on" data-loc-type="remote">Remote</span>
+          <span class="cv-pill" data-loc-type="in_person">In-person</span>
+        </div>
+      </div>
+      <div class="cv-field" id="locationCityField" hidden>
+        <label class="cv-label" for="qLocationCity">Which city?</label>
+        <input type="text" class="cv-input" id="qLocationCity" placeholder="e.g. New York, NY" />
+      </div>
+
       <div class="cv-field" style="margin-top: 18px;">
-        <label class="cv-label">Budget per month <span class="cv-label-optional">(optional)</span></label>
+        <label class="cv-label">Compensation <span class="cv-label-optional">(optional)</span></label>
         <div class="cv-budget-display">
           <span class="cv-budget-val" id="budgetMinDisplay">$3,000</span>
           <span class="cv-budget-dash">–</span>
@@ -1425,7 +1437,7 @@ ${fontLink}
           <span class="cv-budget-check">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
-          <span class="lbl">Show budget in the JD</span>
+          <span class="lbl">Show compensation</span>
         </div>
       </div>
     </section>
@@ -1783,6 +1795,8 @@ ${fontLink}
     hours: '', tzZone: '', tzWindow: '',
     // Budget (Section 5)
     budgetMin: 3000, budgetMax: 5000, budgetShow: true,
+    // Location (Section 5)
+    locationType: 'remote', locationCity: '',
     // AI enrichment
     _aiAbout: null,
     _aiResponsibilities: null,
@@ -2259,6 +2273,31 @@ ${fontLink}
   refreshBudgetUI();
 
   // =========================================================
+  // LOCATION TOGGLE — Remote vs In-person, with city field on in-person
+  // =========================================================
+  $$('#locationTypePills .cv-pill').forEach(function(p) {
+    p.addEventListener('click', function() {
+      $$('#locationTypePills .cv-pill').forEach(function(x) { x.classList.remove('on'); });
+      p.classList.add('on');
+      state.locationType = p.dataset.locType;
+      var cityField = $('locationCityField');
+      if (state.locationType === 'in_person') {
+        cityField.hidden = false;
+        setTimeout(function() { $('qLocationCity').focus(); }, 50);
+      } else {
+        cityField.hidden = true;
+        // Keep the typed city in state in case they switch back, but it won't
+        // be used for output while remote is selected.
+      }
+      onStateChange();
+    });
+  });
+  $('qLocationCity').addEventListener('input', function() {
+    state.locationCity = this.value;
+    onStateChange();
+  });
+
+  // =========================================================
   // STATE CHANGE → update locks + re-render preview + trigger AI if ready
   // =========================================================
   var renderTimer = null;
@@ -2292,7 +2331,8 @@ ${fontLink}
       state.nonSoft, state.nonRole, state.nonIndustry, state.nonSoftSkill,
       state.nice,
       state.hours, state.tzZone, state.tzWindow,
-      state.budgetMin, state.budgetMax, state.budgetShow
+      state.budgetMin, state.budgetMax, state.budgetShow,
+      state.locationType, state.locationCity
     ].join('§');
   }
 
@@ -2329,6 +2369,8 @@ ${fontLink}
       budget_min: state.budgetMin,
       budget_max: state.budgetMax,
       budget_show: state.budgetShow,
+      location_type: state.locationType,
+      location_city: state.locationCity,
       hours: state.hours,
       count: state.count,
       tier: state.tier,
@@ -2498,23 +2540,40 @@ ${fontLink}
     }
 
     // Role IS chosen — proper hiring sentence.
+    // Phrase for "remote X" vs "X based in [city]" so the about paragraph
+    // reflects the actual location choice.
+    var inPerson = state.locationType === 'in_person';
+    var city = state.locationCity.trim();
+    var locPhrase = inPerson
+      ? (city ? 'in-person ' : 'in-person ')   // "in-person Executive Assistant"
+      : 'remote ';                             // "remote Executive Assistant"
+    var basedIn = (inPerson && city) ? ' based in ' + city : '';
+
     if (ageWord && industryWord) {
-      s1 = company + ' is a ' + ageWord + industryWord + ' hiring a remote ' + roleLabel + ' to ' + roleData.description + '.';
+      s1 = company + ' is a ' + ageWord + industryWord + ' hiring ' +
+        (inPerson ? 'an ' : 'a ') + locPhrase.trim() + ' ' + roleLabel + basedIn +
+        ' to ' + roleData.description + '.';
     } else if (industryWord) {
-      s1 = company + ' is a' + industryWord + ' hiring a remote ' + roleLabel + ' to ' + roleData.description + '.';
+      s1 = company + ' is a' + industryWord + ' hiring ' +
+        (inPerson ? 'an ' : 'a ') + locPhrase.trim() + ' ' + roleLabel + basedIn +
+        ' to ' + roleData.description + '.';
     } else {
-      s1 = company + ' is hiring a remote ' + roleLabel + ' to ' + roleData.description + '.';
+      s1 = company + ' is hiring ' +
+        (inPerson ? 'an ' : 'a ') + locPhrase.trim() + ' ' + roleLabel + basedIn +
+        ' to ' + roleData.description + '.';
     }
 
-    // Second sentence: hours + tz
+    // Second sentence: hours + tz, location-aware
     var s2 = '';
+    var roleKind = inPerson ? (city ? 'on-site role in ' + city : 'on-site role') : 'fully remote role';
     if (state.hours && state.tzZone) {
       var hoursLower = state.hours.toLowerCase().replace(' (full-time)', ', full-time');
-      s2 = ' This is a fully remote, ' + hoursLower + ' role with overlap in ' + state.tzZone + '.';
+      s2 = ' This is ' + (inPerson ? 'an ' : 'a ') + roleKind.replace(' role', ', ' + hoursLower + ' role') +
+        ' with overlap in ' + state.tzZone + '.';
     } else if (state.hours) {
-      s2 = ' This is a fully remote, ' + state.hours.toLowerCase().replace(' (full-time)', ', full-time') + ' role.';
+      s2 = ' This is ' + (inPerson ? 'an ' : 'a ') + roleKind.replace(' role', ', ' + state.hours.toLowerCase().replace(' (full-time)', ', full-time') + ' role') + '.';
     } else {
-      s2 = ' This is a fully remote role.';
+      s2 = ' This is ' + (inPerson ? 'an ' : 'a ') + roleKind + '.';
     }
 
     return s1 + s2;
@@ -2678,7 +2737,7 @@ ${fontLink}
       companyText = ' · ' + escapeHtml(state.company.trim());
     }
 
-    var subtitleParts = ['Remote'];
+    var subtitleParts = [jdLocationLabel()];
     if (state.hours) subtitleParts.push(state.hours);
     if (state.tzZone) subtitleParts.push(state.tzZone);
     html += '<h3 class="cv-jd-title">' + titleText + companyText + '</h3>';
@@ -2735,7 +2794,7 @@ ${fontLink}
     if (state.hours || state.tzZone || state.tzWindow) {
       var budgetLine = '';
       if (state.budgetShow) {
-        budgetLine = '<div class="dk">Budget</div><div class="dv">' +
+        budgetLine = '<div class="dk">Compensation</div><div class="dv">' +
           formatBudget(state.budgetMin) + '–' + formatBudget(state.budgetMax) + ' / month</div>';
       }
       html += '<div class="cv-jd-section">' +
@@ -2744,7 +2803,7 @@ ${fontLink}
         (state.hours ? '<div class="dk">Hours</div><div class="dv">' + escapeHtml(state.hours) + '</div>' : '') +
         (state.tzZone ? '<div class="dk">Time zone</div><div class="dv">' + escapeHtml(state.tzZone) + (state.tzWindow ? ' · ' + escapeHtml(state.tzWindow) : '') + '</div>' : '') +
         budgetLine +
-        '<div class="dk">Location</div><div class="dv">Remote</div>' +
+        '<div class="dk">Location</div><div class="dv">' + escapeHtml(jdLocationLabel()) + '</div>' +
         '</div></div>';
     }
 
@@ -2763,8 +2822,8 @@ ${fontLink}
           if (state.hours) details.push('Hours: ' + state.hours);
           if (state.tzZone) details.push('Time zone: ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
           var bl = jdBudgetLine();
-          if (bl) details.push('Budget: ' + bl);
-          details.push('Location: Remote');
+          if (bl) details.push('Compensation: ' + bl);
+          details.push('Location: ' + jdLocationLabel());
           text = details.join('\n');
         } else {
           var ul = $('copyTarget-' + key);
@@ -2802,13 +2861,25 @@ ${fontLink}
     return name;
   }
   function jdSubtitleParts() {
-    var p = ['Remote'];
+    // First chunk is the location label: "Remote" or the typed city.
+    var p = [jdLocationLabel()];
     if (state.hours) p.push(state.hours);
     if (state.tzZone) p.push(state.tzZone);
     return p;
   }
-  // Budget formatted for inclusion in exports/plain text/etc.
-  // Returns empty string when the user toggled "Show budget in JD" off.
+  // Returns the location string used everywhere (subtitle, Details row, exports).
+  //  - Remote → "Remote"
+  //  - In-person with a city → "São Paulo, Brazil (in-person)"
+  //  - In-person without a city → "In-person"  (the user just hasn't typed yet)
+  function jdLocationLabel() {
+    if (state.locationType === 'in_person') {
+      var city = state.locationCity.trim();
+      return city ? city + ' (in-person)' : 'In-person';
+    }
+    return 'Remote';
+  }
+  // Compensation formatted for inclusion in exports/plain text/etc.
+  // Returns empty string when the user toggled "Show compensation" off.
   function jdBudgetLine() {
     if (!state.budgetShow) return '';
     return formatBudget(state.budgetMin) + '–' + formatBudget(state.budgetMax) + ' / month';
@@ -2850,8 +2921,8 @@ ${fontLink}
     if (state.hours) lines.push('Hours: ' + state.hours);
     if (state.tzZone) lines.push('Time zone: ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
     var bl1 = jdBudgetLine();
-    if (bl1) lines.push('Budget: ' + bl1);
-    lines.push('Location: Remote');
+    if (bl1) lines.push('Compensation: ' + bl1);
+    lines.push('Location: ' + jdLocationLabel());
     return lines.join('\n');
   }
 
@@ -2897,8 +2968,8 @@ ${fontLink}
     if (state.hours) lines.push('- **Hours:** ' + state.hours);
     if (state.tzZone) lines.push('- **Time zone:** ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
     var bl2 = jdBudgetLine();
-    if (bl2) lines.push('- **Budget:** ' + bl2);
-    lines.push('- **Location:** Remote');
+    if (bl2) lines.push('- **Compensation:** ' + bl2);
+    lines.push('- **Location:** ' + jdLocationLabel());
     return lines.join('\n');
   }
 
@@ -2949,7 +3020,7 @@ ${fontLink}
     lines.push(toLinkedInBold('Details') + ': ' + jdSubtitleParts().join(' · ') +
       (state.tzWindow ? ' · ' + state.tzWindow : ''));
     var bl3 = jdBudgetLine();
-    if (bl3) lines.push(toLinkedInBold('Budget') + ': ' + bl3);
+    if (bl3) lines.push(toLinkedInBold('Compensation') + ': ' + bl3);
     lines.push('');
     lines.push('—');
     lines.push('Need to hire someone like this? Coconut Virtual Professionals can help → https://www.coconutva.com');
@@ -2992,8 +3063,8 @@ ${fontLink}
     if (state.hours) sections += '<li><strong>Hours:</strong> ' + escapeHtml(state.hours) + '</li>';
     if (state.tzZone) sections += '<li><strong>Time zone:</strong> ' + escapeHtml(state.tzZone) + (state.tzWindow ? ' · ' + escapeHtml(state.tzWindow) : '') + '</li>';
     var bl4 = jdBudgetLine();
-    if (bl4) sections += '<li><strong>Budget:</strong> ' + escapeHtml(bl4) + '</li>';
-    sections += '<li><strong>Location:</strong> Remote</li>';
+    if (bl4) sections += '<li><strong>Compensation:</strong> ' + escapeHtml(bl4) + '</li>';
+    sections += '<li><strong>Location:</strong> ' + escapeHtml(jdLocationLabel()) + '</li>';
     sections += '</ul>';
 
     return '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office"' +
@@ -3123,8 +3194,8 @@ ${fontLink}
       if (state.hours) detailItems.push('Hours: ' + state.hours);
       if (state.tzZone) detailItems.push('Time zone: ' + state.tzZone + (state.tzWindow ? ' · ' + state.tzWindow : ''));
       var bl5 = jdBudgetLine();
-      if (bl5) detailItems.push('Budget: ' + bl5);
-      detailItems.push('Location: Remote');
+      if (bl5) detailItems.push('Compensation: ' + bl5);
+      detailItems.push('Location: ' + jdLocationLabel());
       bulletList(detailItems);
 
       doc.save(jdSafeFilename() + '.pdf');
