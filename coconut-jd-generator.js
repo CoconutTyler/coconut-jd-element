@@ -826,6 +826,115 @@ ${fontLink}
   }
 
   /* ============================================
+     SHARE BAR — discreet "pass it along" section below the tool
+     ============================================ */
+  .cv-share-bar {
+    max-width: 1240px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+  }
+  .cv-share-inner {
+    background: var(--cv-bg-mint);
+    border: 1px solid var(--cv-green-200);
+    border-radius: var(--cv-radius-lg);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cv-share-text {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1 1 280px;
+  }
+  .cv-share-emoji {
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .cv-share-title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--cv-fg-1);
+    line-height: 1.3;
+  }
+  .cv-share-sub {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--cv-fg-3);
+    line-height: 1.3;
+  }
+  .cv-share-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .cv-share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: white;
+    border: 1px solid var(--cv-border);
+    color: var(--cv-fg-1);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: var(--cv-radius-pill);
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .cv-share-btn:hover {
+    border-color: var(--cv-green-600);
+    color: var(--cv-green-700);
+    transform: translateY(-1px);
+    box-shadow: var(--cv-shadow-sm);
+  }
+  .cv-share-btn:active { transform: translateY(0); }
+  .cv-share-copy {
+    background: var(--cv-navy-900);
+    color: var(--cv-fg-inverse);
+    border-color: var(--cv-navy-900);
+  }
+  .cv-share-copy:hover {
+    background: var(--cv-navy-800);
+    color: var(--cv-fg-inverse);
+    border-color: var(--cv-navy-800);
+  }
+  .cv-share-copy.copied {
+    background: var(--cv-green-600);
+    border-color: var(--cv-green-600);
+  }
+  .cv-share-copy.copied:hover {
+    background: var(--cv-green-600);
+    border-color: var(--cv-green-600);
+  }
+  .cv-share-ico { width: 15px; height: 15px; flex-shrink: 0; }
+  .cv-share-icon-btn { width: 38px; padding: 0; }
+  .cv-share-icon-btn svg { width: 16px; height: 16px; }
+
+  /* Mobile — stack text above buttons */
+  @media (max-width: 720px) {
+    .cv-share-bar { padding: 0 16px; margin-top: 16px; }
+    .cv-share-inner {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 16px 18px;
+    }
+    .cv-share-text { flex: 0 1 auto; }
+    .cv-share-actions { width: 100%; justify-content: space-between; }
+    .cv-share-copy { flex: 1; min-width: 0; }
+  }
+
+  /* ============================================
      LEAD CAPTURE MODAL — opens when user clicks "Find me candidates"
      ============================================ */
   .cv-modal-backdrop {
@@ -1529,7 +1638,35 @@ ${fontLink}
   </div>
 </div>
 
-<!-- ============ LEAD CAPTURE MODAL ============ -->
+<!-- ============ SHARE BAR ============ -->
+<!-- Tyler's idea: easy way for people to share the tool. Sits below the
+     main two-pane shell, full width, on every page state (empty or filled). -->
+<div class="cv-share-bar" id="shareBar">
+  <div class="cv-share-inner">
+    <div class="cv-share-text">
+      <div class="cv-share-emoji" aria-hidden="true">🥥</div>
+      <div>
+        <p class="cv-share-title">Know someone hiring? Pass this along.</p>
+        <p class="cv-share-sub">Free tool, no signup, polished JD in 2 minutes.</p>
+      </div>
+    </div>
+    <div class="cv-share-actions">
+      <button type="button" class="cv-share-btn cv-share-copy" id="shareCopyBtn" aria-label="Copy link">
+        <svg class="cv-share-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span class="cv-share-label" id="shareCopyLabel">Copy link</span>
+      </button>
+      <button type="button" class="cv-share-btn cv-share-icon-btn" id="shareLinkedInBtn" aria-label="Share on LinkedIn" title="Share on LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+      </button>
+      <button type="button" class="cv-share-btn cv-share-icon-btn" id="shareXBtn" aria-label="Share on X" title="Share on X">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </button>
+      <button type="button" class="cv-share-btn cv-share-icon-btn" id="shareEmailBtn" aria-label="Share via email" title="Share via email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 <div class="cv-modal-backdrop" id="leadModal" hidden>
   <div class="cv-modal" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle">
     <button class="cv-modal-close" id="leadModalClose" type="button" aria-label="Close">
@@ -1571,11 +1708,13 @@ ${fontLink}
     var root = this.shadowRoot;
     var self = this;
 
-    // Observe size changes so Wix can resize the iframe
+    // Observe size changes so Wix can resize the iframe.
+    // We observe the host (not just .cv-shell) so the share bar's height
+    // is included — it sits below the shell as a sibling, not inside.
     if (typeof ResizeObserver !== 'undefined') {
       try {
         var ro = new ResizeObserver(function() { self.notifyHeight(); });
-        ro.observe(root.querySelector('.cv-shell') || root.host);
+        ro.observe(root.host || root.querySelector('.cv-shell'));
       } catch (e) { /* noop */ }
     }
 
@@ -3409,6 +3548,89 @@ ${fontLink}
   $('leadEmailInput').addEventListener('input', function() {
     this.classList.remove('error');
     $('leadErrorMsg').hidden = true;
+  });
+
+  // =========================================================
+  // SHARE BAR — copy link + LinkedIn + X + Email handlers
+  // =========================================================
+  // The URL to share is the live JD generator page itself. We use the
+  // document location so the same code works in dev/preview environments
+  // without needing a hardcoded constant.
+  function getShareUrl() {
+    // Prefer the canonical public URL when running on the production domain;
+    // fall back to wherever the widget is currently embedded.
+    try {
+      var loc = (document && document.location) ? document.location : null;
+      if (loc && loc.host && loc.host.indexOf('coconutva.com') >= 0) {
+        return 'https://www.coconutva.com/job-description-generator';
+      }
+      if (loc) return loc.origin + loc.pathname;
+    } catch (e) { /* ignore */ }
+    return 'https://www.coconutva.com/job-description-generator';
+  }
+  var SHARE_BLURB = 'Free Job Description Generator — build a recruiter-grade JD in 2 minutes. No signup.';
+  var SHARE_EMAIL_SUBJECT = 'Free tool: build a job description in 2 minutes';
+  var SHARE_EMAIL_BODY = 'Saw this and thought of you — it\'s a free tool by Coconut that builds a polished job description in about 2 minutes. No signup, just fill it out and you get a JD ready to post.\n\n' + getShareUrl() + '\n\nMight be worth a look if you\'re hiring.';
+
+  // Copy link — primary action. On click, copy the URL to clipboard and
+  // flip the button into a "Copied!" state for 1.8s.
+  $('shareCopyBtn').addEventListener('click', function() {
+    var url = getShareUrl();
+    var label = $('shareCopyLabel');
+    var btn = $('shareCopyBtn');
+    function flipToCopied() {
+      btn.classList.add('copied');
+      label.textContent = 'Copied!';
+      setTimeout(function() {
+        btn.classList.remove('copied');
+        label.textContent = 'Copy link';
+      }, 1800);
+    }
+    // Modern Clipboard API (works in secure contexts)
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(flipToCopied).catch(function() {
+        // Fallback if user denies clipboard permission
+        fallbackCopy(url, flipToCopied);
+      });
+    } else {
+      fallbackCopy(url, flipToCopied);
+    }
+  });
+  function fallbackCopy(text, onSuccess) {
+    // Legacy fallback: create a temporary textarea, select, execCommand copy.
+    // Works in older browsers and non-secure contexts.
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      onSuccess();
+    } catch (e) { /* clipboard not available — silently no-op */ }
+  }
+
+  // LinkedIn — opens the share dialog with the URL pre-filled.
+  // LinkedIn's share URL takes care of the preview card (title, image)
+  // by scraping our page's OpenGraph tags.
+  $('shareLinkedInBtn').addEventListener('click', function() {
+    var url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(getShareUrl());
+    window.open(url, '_blank', 'noopener,noreferrer');
+  });
+
+  // X (Twitter) — pre-fills text + URL.
+  $('shareXBtn').addEventListener('click', function() {
+    var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(SHARE_BLURB) + '&url=' + encodeURIComponent(getShareUrl());
+    window.open(url, '_blank', 'noopener,noreferrer');
+  });
+
+  // Email — mailto: with subject and body pre-filled. Opens the user's
+  // default mail client (Gmail in browser if configured, Outlook, etc.)
+  $('shareEmailBtn').addEventListener('click', function() {
+    var url = 'mailto:?subject=' + encodeURIComponent(SHARE_EMAIL_SUBJECT) + '&body=' + encodeURIComponent(SHARE_EMAIL_BODY);
+    window.location.href = url;
   });
 
   // =========================================================
