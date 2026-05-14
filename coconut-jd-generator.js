@@ -810,6 +810,8 @@ ${fontLink}
     z-index: 999;
     animation: modalFade 200ms var(--cv-ease-out);
   }
+  /* HTML hidden attribute is overridden by display:flex above. Force it back. */
+  .cv-modal-backdrop[hidden] { display: none; }
   @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
   .cv-modal {
     background: var(--cv-bg);
