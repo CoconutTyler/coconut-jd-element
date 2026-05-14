@@ -1319,20 +1319,26 @@ ${fontLink}
       if (anyPrevComplete && SECTIONS[idx-1].complete()) {
         if (el.classList.contains('locked')) {
           el.classList.remove('locked');
-          // small delay then scroll the freshly-revealed section into view
+          // Wait for the unlock transition (~360ms) and any layout to settle,
+          // then scroll the section to the very top of the form pane.
           setTimeout(function() {
             if (window.innerWidth < 960) {
               // mobile: page scroll
               el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } else {
-              // desktop: scroll inside the form pane (which has internal scroll)
+              // desktop: scroll INSIDE the form pane.
+              // Using getBoundingClientRect for accuracy regardless of offsetParent.
               var pane = root.querySelector('.cv-form-pane');
               if (pane) {
-                var top = el.offsetTop - 20;
-                pane.scrollTo({ top: top, behavior: 'smooth' });
+                var paneRect = pane.getBoundingClientRect();
+                var elRect = el.getBoundingClientRect();
+                // Position the section's top right against the pane's top edge,
+                // minus 8px breathing room so the eyebrow doesn't hug the border.
+                var targetScroll = pane.scrollTop + (elRect.top - paneRect.top) - 8;
+                pane.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
               }
             }
-          }, 200);
+          }, 420);
         }
       } else {
         anyPrevComplete = false;
@@ -1818,7 +1824,7 @@ ${fontLink}
   //  - Hero (match score + CTAs) when "ready" (role + 3+ resps + tools + english)
 
   function hasAnyData() {
-    return !!(state.company || state.role);
+    return !!(state.company || state.role || state.industry || state.years || state.position);
   }
 
   function isJDReady() {
@@ -1877,15 +1883,29 @@ ${fontLink}
   }
 
   function buildAboutParagraphDeterministic() {
-    var roleLabel = state.roleLabel || 'this role';
+    var roleLabel = state.roleLabel;
     var roleData = getRoleData(state.role);
-    var company = state.company.trim() || 'A growing company';
+    var company = state.company.trim() || 'Your company';
     var ageWord = companyAge(state.years);
     var industryWord = industryNote(state.industry);
 
-    // Build natural sentence
-    // "ACME is a {ageWord} {industry} hiring a remote {role} to {description}."
     var s1;
+    if (!state.role) {
+      // No role chosen yet — descriptive of the company only.
+      // Pulls the user forward without making up role details.
+      if (ageWord && industryWord) {
+        s1 = company + ' is a ' + ageWord + industryWord + '. Pick a role on the left and the rest of this JD will fill in as you go.';
+      } else if (industryWord) {
+        s1 = company + ' is a' + industryWord + '. Pick a role on the left and the rest of this JD will fill in as you go.';
+      } else if (ageWord) {
+        s1 = company + ' is a ' + ageWord + ' business. Pick a role on the left and the rest of this JD will fill in as you go.';
+      } else {
+        s1 = company + ' is preparing to hire. Pick a role on the left and the rest of this JD will fill in as you go.';
+      }
+      return s1;
+    }
+
+    // Role IS chosen — proper hiring sentence.
     if (ageWord && industryWord) {
       s1 = company + ' is a ' + ageWord + industryWord + ' hiring a remote ' + roleLabel + ' to ' + roleData.description + '.';
     } else if (industryWord) {
@@ -2048,19 +2068,33 @@ ${fontLink}
     var html = '';
     var roleLabel = state.roleLabel || 'this role';
 
-    // Title + subtitle
+    // Title + subtitle — show as soon as we have anything to anchor it
+    var titleText;
     if (state.role) {
-      var subtitleParts = ['Remote'];
-      if (state.hours) subtitleParts.push(state.hours);
-      if (state.tzZone) subtitleParts.push(state.tzZone);
-      html += '<h3 class="cv-jd-title">' + escapeHtml(roleLabel) + (state.company.trim() ? ' — ' + escapeHtml(state.company.trim()) : '') + '</h3>';
-      html += '<p class="cv-jd-subtitle">' + escapeHtml(subtitleParts.join(' · ')) + '</p>';
+      titleText = escapeHtml(roleLabel);
+    } else if (state.company.trim()) {
+      titleText = 'Job description draft';
+    } else {
+      titleText = 'Your job description';
+    }
+    var companyText = '';
+    if (state.role && state.company.trim()) {
+      companyText = ' — ' + escapeHtml(state.company.trim());
+    } else if (!state.role && state.company.trim()) {
+      companyText = ' · ' + escapeHtml(state.company.trim());
     }
 
-    // About the role — needs company + role
-    if (state.role && state.company.trim()) {
+    var subtitleParts = ['Remote'];
+    if (state.hours) subtitleParts.push(state.hours);
+    if (state.tzZone) subtitleParts.push(state.tzZone);
+    html += '<h3 class="cv-jd-title">' + titleText + companyText + '</h3>';
+    html += '<p class="cv-jd-subtitle">' + escapeHtml(subtitleParts.join(' · ')) + '</p>';
+
+    // About — show as soon as ANY company/industry/years info is in
+    if (state.company.trim() || state.industry || state.years || state.role) {
+      var aboutHeader = state.role ? 'About the role' : 'About the company';
       html += '<div class="cv-jd-section">' +
-        '<div class="cv-jd-h3">About the role ' + copyBtnHtml('about') + '</div>' +
+        '<div class="cv-jd-h3">' + aboutHeader + ' ' + copyBtnHtml('about') + '</div>' +
         '<div id="copyTarget-about"><p>' + escapeHtml(buildAboutParagraph()) + '</p></div></div>';
     }
 
