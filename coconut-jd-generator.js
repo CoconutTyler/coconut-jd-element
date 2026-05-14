@@ -47,7 +47,7 @@ ${fontLink}
     width: 100%;
     font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color: #07152B;
-    background: #F5F5F7;
+    background: #FFFFFF;
     font-size: 16px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
